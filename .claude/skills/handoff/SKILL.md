@@ -93,6 +93,28 @@ Invoke `/ux #N`, parse for `UX RESULT:`.
 2. If `< 3`: `🔁 UX review failed on #N (attempt <n>/2). Retrying dev...` — reopen, `/board update #N in-dev`, return to Step 3.
 3. If `>= 3`: escalate, `/board update #N blocked`, stop.
 
+### Step 6.75 — Commit & Push
+
+Before closing the board, capture this issue's work in git so it can't pile up uncommitted across sessions (this project went ~80 issues without a single real commit before that got fixed — don't let it happen again).
+
+1. `git add -A` at the repo root.
+2. If `git status --porcelain` shows nothing staged, skip straight to Step 7 (nothing to commit — /dev's changes were already captured some other way).
+3. Otherwise commit:
+   ```
+   git commit -m "Close #N: <issue title>
+
+   <one-line summary of what shipped, from /dev's completion report>
+
+   Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>"
+   ```
+4. `git push origin master`. If the push fails (e.g. remote has diverged), do **not** proceed to board close — escalate instead:
+   ```
+   ⚠️ Handoff blocked on #N — push failed after successful implementation
+   Reason: [git error]
+   Action needed: resolve the git state manually (pull/rebase), then re-run /handoff #N — dev/test/ux already passed, only the commit/push step needs retrying.
+   ```
+   Stop.
+
 ### Step 7 — Ship
 
 1. `/board close #N <one-line summary of what shipped>`

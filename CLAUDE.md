@@ -1514,6 +1514,8 @@ This project uses the same agent pipeline as the studio's other Unity project (B
 
 See each skill's file in `.claude/skills/` for full detail. Recommended flow: `/ba <idea>` → `/arch` → `/board` creates the issue → `greenlight #N` to run the rest autonomously, or drive steps manually.
 
+**Git convention (established 2026-09-02):** this project went from its initial scaffold commit to ~80 shipped issues with zero further commits — everything was sitting uncommitted on disk. Fixed by (1) committing all actual project content (`Assets/Scripts`, `Prefabs`, `Data`, `Editor`, `Scenes`, etc.) and (2) adding `/handoff`'s own Step 6.75, which commits and pushes automatically once an issue passes test+UX, before board close — so this can't silently pile up again. **Large third-party asset packs are deliberately excluded from git** (`.gitignore`: `TopDownAssets`, `RPGW_GL_v2.0`, `ScifiRTSSeriesMegaPackI`/`II`/`III`, `SpacePlatformKit`, `Universal Sound FX`) — they're re-importable from their source, and versioning ~5GB of vendor binaries would blow past GitHub's free Git LFS quota for no real benefit. If you add a new large purchased asset pack, add it to `.gitignore` the same way rather than letting it get committed by default.
+
 **First real session should be `/ba` on the Economy Round / Battle Round core loop** — everything else in Phase 1 depends on it.
 
 ---
