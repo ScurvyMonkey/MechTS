@@ -19,6 +19,17 @@ namespace MechTS.Economy
         public GameObject prefab;
 
         /// <summary>
+        /// If non-empty, every placement (single or splash) picks one random entry from this
+        /// array to instantiate instead of <see cref="prefab"/> — lets one brush (e.g. "Rock")
+        /// scatter naturally varied-looking results from a themed set of prefabs rather than
+        /// stamping the same model repeatedly (issue #86). <see cref="prefab"/> can be left
+        /// unassigned for a variants-only brush — the Map Editor tool's paint/erase logic
+        /// treats a non-empty <see cref="prefabVariants"/> as equally valid. Default empty —
+        /// every brush that doesn't opt in behaves exactly as before.
+        /// </summary>
+        public GameObject[] prefabVariants;
+
+        /// <summary>
         /// If true, painting this brush scatters <see cref="splashCount"/> randomized
         /// instances within <see cref="splashRadius"/> instead of placing exactly one at the
         /// resolved point. Default false — every brush that doesn't opt in behaves exactly as

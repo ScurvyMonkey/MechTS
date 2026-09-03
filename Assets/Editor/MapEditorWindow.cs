@@ -260,7 +260,7 @@ namespace MechTS.EditorTools
         /// <param name="worldPoint">The Ground-layer surface world position to paint at (issue #35: this may be bare Ground, a Platform's top, or a Ramp's sloped surface).</param>
         private void TryPaint(Vector3 worldPoint)
         {
-            if (_selectedBrush.prefab == null) return;
+            if (!HasPaintablePrefab(_selectedBrush)) return;
             float requiredSpacing = _selectedBrush.isSplashBrush
                 ? Mathf.Max(MinPaintSpacing, _selectedBrush.splashRadius)
                 : MinPaintSpacing;
@@ -279,6 +279,59 @@ namespace MechTS.EditorTools
         }
 
         /// <summary>
+        /// Whether the given brush has something to actually instantiate — either a single
+        /// <see cref="MapBrushDefinition.prefab"/> or a non-empty
+        /// <see cref="MapBrushDefinition.prefabVariants"/> (issue #86). Every paint/erase entry
+        /// point gates on this instead of checking <c>prefab == null</c> directly, so a
+        /// variants-only brush (no single <c>prefab</c> assigned) is still paintable/erasable.
+        /// </summary>
+        /// <param name="brush">The brush to check.</param>
+        private static bool HasPaintablePrefab(MapBrushDefinition brush)
+        {
+            return brush.prefab != null || (brush.prefabVariants != null && brush.prefabVariants.Length > 0);
+        }
+
+        /// <summary>
+        /// Resolves which prefab a single placement of the given brush should instantiate —
+        /// a random entry from <see cref="MapBrushDefinition.prefabVariants"/> when non-empty
+        /// (issue #86), otherwise the brush's single <see cref="MapBrushDefinition.prefab"/>.
+        /// Called independently per instance by both <see cref="PaintSingle"/> and each
+        /// iteration of <see cref="PaintSplash"/>'s loop, so a splash-cluster batch scatters
+        /// naturally varied results rather than one model repeated.
+        /// </summary>
+        /// <param name="brush">The brush being painted.</param>
+        private static GameObject ResolvePrefab(MapBrushDefinition brush)
+        {
+            if (brush.prefabVariants != null && brush.prefabVariants.Length > 0)
+            {
+                return brush.prefabVariants[Random.Range(0, brush.prefabVariants.Length)];
+            }
+            return brush.prefab;
+        }
+
+        /// <summary>
+        /// Whether <paramref name="source"/> — a scene instance's traced-back original prefab
+        /// asset (<see cref="PrefabUtility.GetCorrespondingObjectFromOriginalSource"/>) —
+        /// belongs to the given brush: either its single <see cref="MapBrushDefinition.prefab"/>
+        /// or any entry in its <see cref="MapBrushDefinition.prefabVariants"/> (issue #86).
+        /// Without the variants check, <see cref="TryErase"/> would only ever recognize
+        /// instances matching whichever single variant happened to be placed most recently as
+        /// <c>prefab</c>, silently leaving every other variant permanently un-erasable.
+        /// </summary>
+        /// <param name="brush">The currently selected brush.</param>
+        /// <param name="source">The traced-back prefab asset of a candidate scene instance.</param>
+        private static bool IsBrushSource(MapBrushDefinition brush, Object source)
+        {
+            if (source == brush.prefab) return true;
+            if (brush.prefabVariants == null) return false;
+            foreach (var variant in brush.prefabVariants)
+            {
+                if (source == variant) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Instantiates the selected brush's prefab exactly at the given world position,
         /// parented under its category's organizational GameObject.
         /// </summary>
@@ -286,7 +339,7 @@ namespace MechTS.EditorTools
         private void PaintSingle(Vector3 worldPoint)
         {
             var parent = GetOrCreateCategoryParent(_selectedBrush.category);
-            var instance = (GameObject)PrefabUtility.InstantiatePrefab(_selectedBrush.prefab, parent.transform);
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(ResolvePrefab(_selectedBrush), parent.transform);
             instance.transform.position = worldPoint;
             Undo.RegisterCreatedObjectUndo(instance, $"Paint {_selectedBrush.displayName}");
 
@@ -354,7 +407,7 @@ namespace MechTS.EditorTools
                 Vector3 rayOrigin = new Vector3(originPoint.x + offset.x, originPoint.y + SplashRaycastHeight, originPoint.z + offset.y);
                 if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, MaxRaycastDistance, groundLayerMask)) continue;
 
-                var instance = (GameObject)PrefabUtility.InstantiatePrefab(_selectedBrush.prefab, parent.transform);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(ResolvePrefab(_selectedBrush), parent.transform);
                 instance.transform.position = hit.point;
 
                 if (_selectedBrush.randomizeRotation)
@@ -472,7 +525,7 @@ namespace MechTS.EditorTools
         /// <param name="worldPoint">The Ground-layer surface world position to erase at.</param>
         private void TryErase(Vector3 worldPoint)
         {
-            if (_selectedBrush == null || _selectedBrush.prefab == null) return;
+            if (_selectedBrush == null || !HasPaintablePrefab(_selectedBrush)) return;
 
             var mapContent = GameObject.Find("MapContent");
             if (mapContent == null) return;
@@ -485,11 +538,12 @@ namespace MechTS.EditorTools
             {
                 foreach (Transform child in categoryParent)
                 {
-                    // Only ever consider instances of the selected brush's own prefab — never
-                    // the nearest object regardless of type, even one painted by a different
-                    // brush sitting right next to it.
+                    // Only ever consider instances of the selected brush's own prefab (or, for
+                    // a variant brush, any one of its prefabVariants) — never the nearest
+                    // object regardless of type, even one painted by a different brush sitting
+                    // right next to it.
                     var source = PrefabUtility.GetCorrespondingObjectFromOriginalSource(child.gameObject);
-                    if (source != _selectedBrush.prefab) continue;
+                    if (!IsBrushSource(_selectedBrush, source)) continue;
 
                     Vector2 childXZ = new Vector2(child.position.x, child.position.z);
                     float dist = Vector2.Distance(childXZ, clickXZ);
