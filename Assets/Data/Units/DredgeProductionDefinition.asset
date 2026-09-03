@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.UnitProductionDefinition
   displayName: Dredge
   prefab: {fileID: 5090810918497608035, guid: 8cfd3373f2a31de4cbc37f3caedd5e70, type: 3}
-  enemyPrefabOverride: {fileID: 0}
+  enemyPrefabOverride: {fileID: 6169381107499825786, guid: 5ced1e1a592bbaf458d89bfbc0d679df, type: 3}
   oreCost: 40
   biomassCost: 20
   goldCost: 10

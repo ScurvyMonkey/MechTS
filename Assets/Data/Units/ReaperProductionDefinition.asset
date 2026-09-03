@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.UnitProductionDefinition
   displayName: Reaper
   prefab: {fileID: 608522076886329636, guid: 47a1da810fd84ed4ca44e1a4a807f6f4, type: 3}
-  enemyPrefabOverride: {fileID: 0}
+  enemyPrefabOverride: {fileID: 8164939610644641126, guid: 5d5516c303a24ef40b432efc9f417291, type: 3}
   oreCost: 15
   biomassCost: 15
   goldCost: 0

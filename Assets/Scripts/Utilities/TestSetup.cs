@@ -8,12 +8,13 @@ namespace MechTS.Utilities
 {
     /// <summary>
     /// Manual-testing scaffolding only — not a real game system. Auto-starts the
-    /// Economy Round and spawns one Harvester, one Saboteur, one test combat unit, and one
+    /// Economy Round and spawns one Harvester, one Saboteur, one test combat unit, one
     /// Crewman (issue #42 — no production building can produce it yet, so it needs to be
-    /// spawnable here to be testable at all) near each faction's main building, plus one
-    /// Ranger/Reaper/Dredge (issue #43 — same "no production building yet" reasoning,
-    /// Player faction only since these have no Enemy-variant art yet), so a tester has
-    /// something to click and command immediately on entering Play Mode instead of an empty map.
+    /// spawnable here to be testable at all), and one Ranger/Reaper/Dredge (issue #43 — same
+    /// "no production building yet" reasoning) near each faction's main building, so a tester
+    /// has something to click and command immediately on entering Play Mode instead of an
+    /// empty map. Every unit type now has real Enemy-faction art (issue #83) and spawns for
+    /// both factions — the old Player-only restriction on Ranger/Reaper/Dredge is gone.
     /// </summary>
     public class TestSetup : MonoBehaviour
     {
@@ -30,6 +31,9 @@ namespace MechTS.Utilities
         [SerializeField] private GameObject _enemySaboteurPrefab;
         [SerializeField] private GameObject _enemyTestCombatUnitPrefab;
         [SerializeField] private GameObject _enemyCrewmanPrefab;
+        [SerializeField] private GameObject _enemyRangerPrefab;
+        [SerializeField] private GameObject _enemyReaperPrefab;
+        [SerializeField] private GameObject _enemyDredgePrefab;
 
         /// <summary>
         /// Waits one frame so every manager's own Start() has run and subscribed to
@@ -60,18 +64,15 @@ namespace MechTS.Utilities
             Faction faction = mainBuilding.Faction;
 
             var harvesterGo = SpawnUnit(SelectPrefab(_harvesterPrefab, _enemyHarvesterPrefab, faction), basePos + new Vector3(4f, 0f, 2f), faction, skipFactionTint: true);
-            SpawnUnit(SelectPrefab(_saboteurPrefab, _enemySaboteurPrefab, faction), basePos + new Vector3(4f, 0f, -2f), faction);
+            SpawnUnit(SelectPrefab(_saboteurPrefab, _enemySaboteurPrefab, faction), basePos + new Vector3(4f, 0f, -2f), faction, skipFactionTint: true);
             SpawnUnit(SelectPrefab(_testCombatUnitPrefab, _enemyTestCombatUnitPrefab, faction), basePos + new Vector3(6f, 0f, 0f), faction);
             SpawnUnit(SelectPrefab(_crewmanPrefab, _enemyCrewmanPrefab, faction), basePos + new Vector3(6f, 0f, -3f), faction, skipFactionTint: true);
 
-            // Ranger/Reaper/Dredge (issue #43) have no Enemy-faction art yet — spawned for
-            // Player only, matching the issue's explicit "Enemy equivalents out of scope."
-            if (faction == Faction.Player)
-            {
-                SpawnUnit(_rangerPrefab, basePos + new Vector3(8f, 0f, 2f), faction);
-                SpawnUnit(_reaperPrefab, basePos + new Vector3(8f, 0f, 0f), faction);
-                SpawnUnit(_dredgePrefab, basePos + new Vector3(8f, 0f, -2f), faction);
-            }
+            // Ranger/Reaper/Dredge now have real Enemy-faction art (issue #83) — spawn for
+            // both factions, same as every other unit type above.
+            SpawnUnit(SelectPrefab(_rangerPrefab, _enemyRangerPrefab, faction), basePos + new Vector3(8f, 0f, 2f), faction, skipFactionTint: true);
+            SpawnUnit(SelectPrefab(_reaperPrefab, _enemyReaperPrefab, faction), basePos + new Vector3(8f, 0f, 0f), faction, skipFactionTint: true);
+            SpawnUnit(SelectPrefab(_dredgePrefab, _enemyDredgePrefab, faction), basePos + new Vector3(8f, 0f, -2f), faction, skipFactionTint: true);
 
             if (faction == Faction.Player && harvesterGo != null)
             {

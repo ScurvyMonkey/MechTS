@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.UnitProductionDefinition
   displayName: Ranger
   prefab: {fileID: 7325832443099744918, guid: 6d9fcf400137a744bb5c70fa8869c6d5, type: 3}
-  enemyPrefabOverride: {fileID: 0}
+  enemyPrefabOverride: {fileID: 5288230758254323155, guid: 45e1676cb13a683408613b6b95772369, type: 3}
   oreCost: 20
   biomassCost: 10
   goldCost: 0
