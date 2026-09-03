@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: DroneFactoryDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Drone Factory
-  prefab: {fileID: 6519781200196750460, guid: 0bc67352120757848bfcfdf76d31fc63, type: 3}
+  prefab: {fileID: 6460049016131472206, guid: 3623393f0ea984843972185c90a1c396, type: 3}
+  enemyPrefabOverride: {fileID: 7984922478153507351, guid: aaf41c92d71669546bfe64d0c9765447, type: 3}
   oreCost: 20
   biomassCost: 0
   goldCost: 0
@@ -27,3 +28,11 @@ MonoBehaviour:
   canProduceUnits: 1
   producibleUnits:
   - {fileID: 11400000, guid: 9c1c07bda66587941bf7676d63c92c83, type: 2}
+  enablesResearch: 0
+  enablesTurretConstruction: 0
+  requiresRoboticsPlant: 0
+  requiresResourceNode: 0
+  autoGatherRatePerSecond: 0
+  isSilo: 0
+  siloResourceType: 0
+  siloCapacity: 0

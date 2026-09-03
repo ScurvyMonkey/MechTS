@@ -88,7 +88,7 @@ namespace MechTS.Economy
         /// </summary>
         private void BeginConstruction()
         {
-            var instance = Instantiate(_pendingDefinition.prefab, _pendingPosition, Quaternion.identity);
+            var instance = Instantiate(_pendingDefinition.GetPrefab(_unit.Faction), _pendingPosition, Quaternion.identity);
             var buildingInstance = instance.GetComponent<BuildingInstance>();
             if (buildingInstance == null)
             {
@@ -97,7 +97,13 @@ namespace MechTS.Economy
 
             buildingInstance.Initialize(_pendingDefinition, _unit.Faction);
             buildingInstance.BeginConstruction();
-            MechTS.Utilities.FactionColor.Apply(instance, _unit.Faction);
+            // Skip the placeholder tint once this definition has real per-faction art
+            // (issue #81/#82's finding) — tinting would corrupt it instead of substituting
+            // for art that doesn't exist yet.
+            if (_pendingDefinition.enemyPrefabOverride == null)
+            {
+                MechTS.Utilities.FactionColor.Apply(instance, _unit.Faction);
+            }
 
             _siteInstance = buildingInstance;
             _elapsed = 0f;

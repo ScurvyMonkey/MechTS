@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: OreSiloDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Ore Silo
-  prefab: {fileID: 692859978062314416, guid: ac5060d0725cc4c4480a51da0c9aceff, type: 3}
+  prefab: {fileID: 6146895470049396742, guid: 54049f67e93aa504eb1856db2cd040f5, type: 3}
+  enemyPrefabOverride: {fileID: 1261927563704588492, guid: 03f4a4af4a2382a4192c4cc88ff4a0d0, type: 3}
   oreCost: 15
   biomassCost: 0
   goldCost: 0

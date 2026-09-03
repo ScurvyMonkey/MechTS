@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: BiomassSiloDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Biomass Silo
-  prefab: {fileID: 8200574981608459516, guid: ca6326a3d24b1b546a9f81c3697147bc, type: 3}
+  prefab: {fileID: 6449527472497667320, guid: c17e7b62ba29ded4e841cdec69c0f7d8, type: 3}
+  enemyPrefabOverride: {fileID: 5976092228048975370, guid: 41e97a6d1ec2a9543b3adbf46899ac6d, type: 3}
   oreCost: 25
   biomassCost: 0
   goldCost: 0

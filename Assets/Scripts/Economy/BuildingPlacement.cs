@@ -63,7 +63,8 @@ namespace MechTS.Economy
             if (_ghost != null) Destroy(_ghost.gameObject);
 
             _pendingBuilding = definition;
-            _ghost = definition != null && definition.prefab != null ? BuildingPlacementGhost.Create(definition.prefab) : null;
+            var ghostPrefab = definition != null ? definition.GetPrefab(_localFaction) : null;
+            _ghost = ghostPrefab != null ? BuildingPlacementGhost.Create(ghostPrefab) : null;
         }
 
         /// <summary>
@@ -212,7 +213,7 @@ namespace MechTS.Economy
         /// <param name="definition">The building being placed, for its footprint size.</param>
         private bool WouldOverlapExistingBuilding(Vector3 position, BuildingDefinition definition)
         {
-            Vector3 halfExtents = GetFootprintHalfExtents(definition);
+            Vector3 halfExtents = GetFootprintHalfExtents(definition, _localFaction);
             var hits = Physics.OverlapBox(position + Vector3.up * halfExtents.y, halfExtents, Quaternion.identity, _buildingLayerMask);
             foreach (var hit in hits)
             {
@@ -228,14 +229,16 @@ namespace MechTS.Economy
         /// defined), or a small default if it has none.
         /// </summary>
         /// <param name="definition">The building definition to measure.</param>
-        private static Vector3 GetFootprintHalfExtents(BuildingDefinition definition)
+        /// <param name="faction">The placing faction, to resolve the correct prefab variant.</param>
+        private static Vector3 GetFootprintHalfExtents(BuildingDefinition definition, Faction faction)
         {
-            if (definition != null && definition.prefab != null)
+            var prefab = definition != null ? definition.GetPrefab(faction) : null;
+            if (prefab != null)
             {
-                var box = definition.prefab.GetComponent<BoxCollider>();
+                var box = prefab.GetComponent<BoxCollider>();
                 if (box != null)
                 {
-                    return Vector3.Scale(box.size, definition.prefab.transform.localScale) * 0.5f;
+                    return Vector3.Scale(box.size, prefab.transform.localScale) * 0.5f;
                 }
             }
             return Vector3.one * 0.5f;

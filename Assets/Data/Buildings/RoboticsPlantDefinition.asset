@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: RoboticsPlantDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Robotics Plant
-  prefab: {fileID: 5656231312883190771, guid: a0edb578cd7df654ba3c3a19e54bee0a, type: 3}
+  prefab: {fileID: 998156986033715429, guid: e087e5f33333aba4b9c3c9b256a09878, type: 3}
+  enemyPrefabOverride: {fileID: 1426716911185689876, guid: f37760edb91ac6c4a90003a39a6d5961, type: 3}
   oreCost: 25
   biomassCost: 10
   goldCost: 0
@@ -29,3 +30,8 @@ MonoBehaviour:
   enablesResearch: 0
   enablesTurretConstruction: 1
   requiresRoboticsPlant: 0
+  requiresResourceNode: 0
+  autoGatherRatePerSecond: 0
+  isSilo: 0
+  siloResourceType: 0
+  siloCapacity: 0

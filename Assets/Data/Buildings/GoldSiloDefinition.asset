@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: GoldSiloDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Gold Silo
-  prefab: {fileID: 5908229833867200235, guid: 797fbd2510a2b344ba7cf33d87253144, type: 3}
+  prefab: {fileID: 8641457194782908638, guid: 1538c8ff3e231594780e216efde4361e, type: 3}
+  enemyPrefabOverride: {fileID: 7041684096545386378, guid: c839a2b6e68d6e149a478d676201e6cd, type: 3}
   oreCost: 25
   biomassCost: 0
   goldCost: 0

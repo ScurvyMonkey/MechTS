@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: BarracksDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Barracks
-  prefab: {fileID: 5079706003947672220, guid: ffc20c617a2ea144ca0a355c96fa5460, type: 3}
+  prefab: {fileID: 3188667580237789169, guid: 3da8569c3ff781a4fa5e1b15d1c19b28, type: 3}
+  enemyPrefabOverride: {fileID: 942894703806796881, guid: bd09f488270b9594e9bd995ceb8c3574, type: 3}
   oreCost: 20
   biomassCost: 0
   goldCost: 0
@@ -29,3 +30,11 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 23513e92816b77446a99e6460f064c5c, type: 2}
   - {fileID: 11400000, guid: c4e2927e4e044e74abc876df017a72ea, type: 2}
   - {fileID: 11400000, guid: 26f526cb7af85814f9bb8050646660b0, type: 2}
+  enablesResearch: 0
+  enablesTurretConstruction: 0
+  requiresRoboticsPlant: 0
+  requiresResourceNode: 0
+  autoGatherRatePerSecond: 0
+  isSilo: 0
+  siloResourceType: 0
+  siloCapacity: 0

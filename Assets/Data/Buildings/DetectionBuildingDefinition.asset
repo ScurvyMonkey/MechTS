@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: DetectionBuildingDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Detection Building
-  prefab: {fileID: 528864113848613181, guid: d888b412045e92249898599c24b07d92, type: 3}
+  prefab: {fileID: 4349720125452476130, guid: af136b86ed6116a42b5617c8875cc0ba, type: 3}
+  enemyPrefabOverride: {fileID: 3241317669837460746, guid: d5037861ab47f294d9f75a51b34558d7, type: 3}
   oreCost: 10
   biomassCost: 0
   goldCost: 0
@@ -26,3 +27,11 @@ MonoBehaviour:
   detectionRadius: 6
   canProduceUnits: 0
   producibleUnits: []
+  enablesResearch: 0
+  enablesTurretConstruction: 0
+  requiresRoboticsPlant: 0
+  requiresResourceNode: 0
+  autoGatherRatePerSecond: 0
+  isSilo: 0
+  siloResourceType: 0
+  siloCapacity: 0

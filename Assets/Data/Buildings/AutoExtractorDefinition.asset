@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: AutoExtractorDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Auto-Extractor
-  prefab: {fileID: 4091566966138011973, guid: 091cfa1d9d4fad74da329554d7f04f5f, type: 3}
+  prefab: {fileID: 3456151412589492196, guid: 49a9f1c6790f44d4f9c64295ebc133cc, type: 3}
+  enemyPrefabOverride: {fileID: 7948152023198620868, guid: 758a9aaf9cc7ee645ac0372a8a68ceb1, type: 3}
   oreCost: 20
   biomassCost: 0
   goldCost: 0
@@ -31,3 +32,6 @@ MonoBehaviour:
   requiresRoboticsPlant: 0
   requiresResourceNode: 1
   autoGatherRatePerSecond: 2
+  isSilo: 0
+  siloResourceType: 0
+  siloCapacity: 0

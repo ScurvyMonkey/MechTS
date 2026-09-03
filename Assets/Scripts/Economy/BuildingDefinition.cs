@@ -13,6 +13,16 @@ namespace MechTS.Economy
         public string displayName;
         public GameObject prefab;
 
+        /// <summary>
+        /// Optional Enemy-faction prefab variant (distinct art, mechanically identical) —
+        /// used by <see cref="BuildingPlacement"/>/<see cref="Economy.CrewmanBuildBehavior"/>
+        /// instead of <see cref="prefab"/> when building for <see cref="Units.Faction.Enemy"/>.
+        /// Mirrors <see cref="UnitProductionDefinition.enemyPrefabOverride"/> exactly. Left
+        /// unassigned, every building falls back to <see cref="prefab"/> for both factions,
+        /// same as before this field existed (issue #82).
+        /// </summary>
+        public GameObject enemyPrefabOverride;
+
         [Header("Cost")]
         public int oreCost;
         public int biomassCost;
@@ -113,6 +123,16 @@ namespace MechTS.Economy
                 { ResourceType.Biomass, biomassCost },
                 { ResourceType.Gold, goldCost }
             };
+        }
+
+        /// <summary>
+        /// Returns the prefab to build for the given faction — <see cref="enemyPrefabOverride"/>
+        /// for <see cref="Units.Faction.Enemy"/> if one is assigned, otherwise <see cref="prefab"/>.
+        /// </summary>
+        /// <param name="faction">The building faction.</param>
+        public GameObject GetPrefab(Units.Faction faction)
+        {
+            return faction == Units.Faction.Enemy && enemyPrefabOverride != null ? enemyPrefabOverride : prefab;
         }
     }
 }

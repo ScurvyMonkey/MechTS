@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: MachineGunTurretDefinition
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
   displayName: Machine Gun Turret
-  prefab: {fileID: 3077713237957599952, guid: 189e04dc47246df4b86399fbaed468c8, type: 3}
+  prefab: {fileID: 4354762238693365027, guid: 99cfd7b0c0da10c46871a1f949290cb1, type: 3}
+  enemyPrefabOverride: {fileID: 7605537083027887581, guid: 73adcd8593d2fc4489c26a916feca73a, type: 3}
   oreCost: 15
   biomassCost: 0
   goldCost: 0
@@ -29,3 +30,8 @@ MonoBehaviour:
   enablesResearch: 0
   enablesTurretConstruction: 0
   requiresRoboticsPlant: 1
+  requiresResourceNode: 0
+  autoGatherRatePerSecond: 0
+  isSilo: 0
+  siloResourceType: 0
+  siloCapacity: 0
