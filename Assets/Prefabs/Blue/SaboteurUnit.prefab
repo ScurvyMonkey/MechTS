@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 2551163764983738199}
   - component: {fileID: 5428626130262709519}
   - component: {fileID: 1126385967649382949}
-  - component: {fileID: 148748153940532563}
   m_Layer: 9
   m_Name: SaboteurUnit
   m_TagString: Untagged
@@ -123,23 +122,6 @@ MonoBehaviour:
   _faction: 0
   _isFlying: 1
   _visionRadius: 10
---- !u!114 &148748153940532563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4169037636967882162}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bbb09494827f7004580bd6f3b4e29fe7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.PropellerSpin
-  _propellers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  _degreesPerSecond: 720
 --- !u!1001 &3023848609656180756
 PrefabInstance:
   m_ObjectHideFlags: 0
