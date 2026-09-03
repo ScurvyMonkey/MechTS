@@ -162,7 +162,9 @@ namespace MechTS.Economy
                 mainBuilding = building.AddComponent<MainBuilding>();
             }
             mainBuilding.Initialize(start.faction, start.mainBuildingMaxHealth, start.mainBuildingVisionRadius, start.mainBuildingProducibleUnits);
-            MechTS.Utilities.FactionColor.Apply(building, start.faction);
+            // No FactionColor.Apply here (issue #81) — every mission's Main Building now has
+            // real per-faction art (Assets/Prefabs/Blue|Red), so tinting would corrupt its
+            // real material instead of substituting for one that doesn't exist yet.
             _mainBuildings[start.faction] = mainBuilding;
         }
 

@@ -27,7 +27,7 @@ MonoBehaviour:
     startingOre: 50
     startingBiomass: 50
     startingGold: 50
-    mainBuildingPrefab: {fileID: 1813392919627959402, guid: 4b3f7d662bfb72145a930b3001cdfae5, type: 3}
+    mainBuildingPrefab: {fileID: 462329781910403860, guid: 5bde6af00e7fd2d4b95f4be5c2641e6f, type: 3}
     mainBuildingMaxHealth: 500
     mainBuildingVisionRadius: 15
     mainBuildingProducibleUnits:

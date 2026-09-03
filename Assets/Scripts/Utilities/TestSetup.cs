@@ -59,10 +59,10 @@ namespace MechTS.Utilities
             Vector3 basePos = mainBuilding.transform.position;
             Faction faction = mainBuilding.Faction;
 
-            var harvesterGo = SpawnUnit(SelectPrefab(_harvesterPrefab, _enemyHarvesterPrefab, faction), basePos + new Vector3(4f, 0f, 2f), faction);
+            var harvesterGo = SpawnUnit(SelectPrefab(_harvesterPrefab, _enemyHarvesterPrefab, faction), basePos + new Vector3(4f, 0f, 2f), faction, skipFactionTint: true);
             SpawnUnit(SelectPrefab(_saboteurPrefab, _enemySaboteurPrefab, faction), basePos + new Vector3(4f, 0f, -2f), faction);
             SpawnUnit(SelectPrefab(_testCombatUnitPrefab, _enemyTestCombatUnitPrefab, faction), basePos + new Vector3(6f, 0f, 0f), faction);
-            SpawnUnit(SelectPrefab(_crewmanPrefab, _enemyCrewmanPrefab, faction), basePos + new Vector3(6f, 0f, -3f), faction);
+            SpawnUnit(SelectPrefab(_crewmanPrefab, _enemyCrewmanPrefab, faction), basePos + new Vector3(6f, 0f, -3f), faction, skipFactionTint: true);
 
             // Ranger/Reaper/Dredge (issue #43) have no Enemy-faction art yet — spawned for
             // Player only, matching the issue's explicit "Enemy equivalents out of scope."
@@ -97,18 +97,25 @@ namespace MechTS.Utilities
         }
 
         /// <summary>
-        /// Instantiates a unit prefab, assigns its faction, and applies the placeholder faction color.
+        /// Instantiates a unit prefab, assigns its faction, and applies the placeholder faction
+        /// color — unless <paramref name="skipFactionTint"/> is set, for a unit type that
+        /// already has real per-faction art (issue #81) and would have that art's material
+        /// corrupted by the tint instead of substituting for art that doesn't exist yet.
         /// </summary>
         /// <param name="prefab">The unit prefab to spawn.</param>
         /// <param name="position">The world position to spawn at.</param>
         /// <param name="faction">The faction to assign.</param>
-        private GameObject SpawnUnit(GameObject prefab, Vector3 position, Faction faction)
+        /// <param name="skipFactionTint">True if this unit type already has real per-faction art.</param>
+        private GameObject SpawnUnit(GameObject prefab, Vector3 position, Faction faction, bool skipFactionTint = false)
         {
             if (prefab == null) return null;
 
             var go = Instantiate(prefab, position, Quaternion.identity);
             go.GetComponent<UnitBase>().SetFaction(faction);
-            FactionColor.Apply(go, faction);
+            if (!skipFactionTint)
+            {
+                FactionColor.Apply(go, faction);
+            }
             return go;
         }
 

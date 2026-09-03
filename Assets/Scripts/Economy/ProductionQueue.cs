@@ -77,7 +77,14 @@ namespace MechTS.Economy
                         unit.MoveTo(_host.RallyPoint.Value);
                     }
                 }
-                MechTS.Utilities.FactionColor.Apply(spawned, _host.Faction);
+                // Skip the placeholder tint once this definition has real per-faction art
+                // (an assigned enemyPrefabOverride implies both prefab and enemyPrefabOverride
+                // are dedicated real art, per issue #81/#82's finding) — tinting would corrupt
+                // it instead of substituting for art that doesn't exist yet.
+                if (_current.enemyPrefabOverride == null)
+                {
+                    MechTS.Utilities.FactionColor.Apply(spawned, _host.Faction);
+                }
                 _current = null;
             }
         }
