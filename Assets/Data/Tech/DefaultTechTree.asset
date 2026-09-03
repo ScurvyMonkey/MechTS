@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d41a68359136c549b074926b0f1c8ee, type: 3}
+  m_Name: DefaultTechTree
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.TechTreeConfig
+  factionTrees:
+  - faction: 0
+    availableUpgrades:
+    - {fileID: 11400000, guid: 865b03f46efae8a43a15802945258a20, type: 2}
+    - {fileID: 11400000, guid: 2e6a82f21a143fd4492ceaafb2904fc5, type: 2}
+    - {fileID: 11400000, guid: f6a9f1d446108ca4192dace269d7671e, type: 2}
+    - {fileID: 11400000, guid: 9c736337e0e1162489429679a252c834, type: 2}
+  - faction: 1
+    availableUpgrades:
+    - {fileID: 11400000, guid: ee09fd76d5830cc48a73133c915f11db, type: 2}
+    - {fileID: 11400000, guid: 1036aa494b1a4c749bbdd18fc7a0d175, type: 2}
+    - {fileID: 11400000, guid: a1ec0773d5c529d43b4d599503ea33aa, type: 2}

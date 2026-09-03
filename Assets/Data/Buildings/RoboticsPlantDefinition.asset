@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8eb088402b504142970a2954a0e02b5, type: 3}
+  m_Name: RoboticsPlantDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
+  displayName: Robotics Plant
+  prefab: {fileID: 5656231312883190771, guid: a0edb578cd7df654ba3c3a19e54bee0a, type: 3}
+  oreCost: 25
+  biomassCost: 10
+  goldCost: 0
+  powerGenerated: 0
+  powerConsumed: 2
+  buildTime: 8
+  maxHealth: 100
+  visionRadius: 8
+  isDetectionCapable: 0
+  detectionRadius: 0
+  canProduceUnits: 0
+  producibleUnits: []
+  enablesResearch: 0
+  enablesTurretConstruction: 1
+  requiresRoboticsPlant: 0

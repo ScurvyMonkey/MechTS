@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5887b55aa197246aafcaa5c651562d, type: 3}
+  m_Name: HumanPlasmaDamage
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.StatUpgradeDefinition
+  displayName: Plasma Damage
+  description: Increases damage dealt by Plasma-type weapons by 20%.
+  tier: 1
+  prerequisites: []
+  oreCost: 50
+  biomassCost: 0
+  goldCost: 0
+  isSwappable: 1
+  statType: 8
+  modifierType: 1
+  value: 0.2
+  targetCapabilities: 0

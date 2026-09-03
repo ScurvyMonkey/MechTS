@@ -55,3 +55,21 @@ Thumbs.db
 
 # Claude Code local settings (machine-specific permissions)
 .claude/settings.local.json
+
+# Third-party asset packs (purchased/imported, re-downloadable from source -
+# excluded to keep the repo small and avoid Git LFS quota/cost; only this
+# project's own Scripts/Prefabs/Data/Scenes/ProjectSettings are versioned)
+/Assets/TopDownAssets/
+/Assets/TopDownAssets.meta
+/Assets/RPGW_GL_v2.0/
+/Assets/RPGW_GL_v2.0.meta
+/Assets/ScifiRTSSeriesMegaPackI/
+/Assets/ScifiRTSSeriesMegaPackI.meta
+/Assets/ScifiRTSSeriesMegaPackII/
+/Assets/ScifiRTSSeriesMegaPackII.meta
+/Assets/ScifiRTSSeriesMegaPackIII/
+/Assets/ScifiRTSSeriesMegaPackIII.meta
+/Assets/SpacePlatformKit/
+/Assets/SpacePlatformKit.meta
+/Assets/Universal Sound FX/
+/Assets/Universal Sound FX.meta

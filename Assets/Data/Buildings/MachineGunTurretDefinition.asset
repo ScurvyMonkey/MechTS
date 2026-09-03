@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8eb088402b504142970a2954a0e02b5, type: 3}
+  m_Name: MachineGunTurretDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
+  displayName: Machine Gun Turret
+  prefab: {fileID: 3077713237957599952, guid: 189e04dc47246df4b86399fbaed468c8, type: 3}
+  oreCost: 15
+  biomassCost: 0
+  goldCost: 0
+  powerGenerated: 0
+  powerConsumed: 1
+  buildTime: 5
+  maxHealth: 120
+  visionRadius: 10
+  isDetectionCapable: 0
+  detectionRadius: 0
+  canProduceUnits: 0
+  producibleUnits: []
+  enablesResearch: 0
+  enablesTurretConstruction: 0
+  requiresRoboticsPlant: 1

@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8eb088402b504142970a2954a0e02b5, type: 3}
+  m_Name: BarracksDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
+  displayName: Barracks
+  prefab: {fileID: 5079706003947672220, guid: ffc20c617a2ea144ca0a355c96fa5460, type: 3}
+  oreCost: 20
+  biomassCost: 0
+  goldCost: 0
+  powerGenerated: 0
+  powerConsumed: 2
+  buildTime: 8
+  maxHealth: 100
+  visionRadius: 8
+  isDetectionCapable: 0
+  detectionRadius: 0
+  canProduceUnits: 1
+  producibleUnits:
+  - {fileID: 11400000, guid: 23513e92816b77446a99e6460f064c5c, type: 2}
+  - {fileID: 11400000, guid: c4e2927e4e044e74abc876df017a72ea, type: 2}
+  - {fileID: 11400000, guid: 26f526cb7af85814f9bb8050646660b0, type: 2}

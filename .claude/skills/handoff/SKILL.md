@@ -108,6 +108,8 @@ Board: issue closed and marked shipped.
 Next up: run /triage to pick the next issue, or greenlight #N manually.
 ```
 
+If this `/handoff` call was the last of several run back-to-back in the same session (a multi-issue batch, e.g. `greenlight` run repeatedly across a `/triage`'d backlog), append a line recommending `/optimize` — a post-batch code-quality/performance sweep — before starting the next unrelated piece of work. Don't run it automatically; `/optimize` is its own confirm-before-acting skill.
+
 ---
 
 ## Test Output Contract (normative)

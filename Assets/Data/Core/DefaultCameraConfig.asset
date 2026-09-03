@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fd44c6a72e76184cb296d1dbc1fa2e6, type: 3}
+  m_Name: DefaultCameraConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Core.CameraConfig
+  panSpeed: 20
+  edgePanMarginPixels: 12
+  boundsMin: {x: -50, y: -50}
+  boundsMax: {x: 50, y: 50}
+  cameraPitchDegrees: 50
+  cameraYawDegrees: 0
+  fieldOfView: 60
+  farClipPlane: 300
+  zoomDistanceMin: 12
+  zoomDistanceMax: 40
+  zoomSpeed: 5
+  defaultZoomDistance: 18

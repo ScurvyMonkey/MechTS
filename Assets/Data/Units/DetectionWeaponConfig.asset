@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f5aaacedabecc245977d48adce1d5f3, type: 3}
+  m_Name: DetectionWeaponConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.WeaponConfig
+  damage: 10
+  fireRate: 1
+  range: 10
+  targetType: 2
+  projectileEffectPrefab: {fileID: 0}
+  casingEffectPrefab: {fileID: 0}
+  fireSound: {fileID: 8300000, guid: 798f1b866b9623a40951a29ff9fb08a1, type: 3}
+  impactSound: {fileID: 8300000, guid: 3ea77433fd34d044aad8f4ae290573c3, type: 3}

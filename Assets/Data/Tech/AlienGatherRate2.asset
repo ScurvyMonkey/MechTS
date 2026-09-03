@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5887b55aa197246aafcaa5c651562d, type: 3}
+  m_Name: AlienGatherRate2
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.StatUpgradeDefinition
+  displayName: Swarm Gathering II
+  description: Increases harvester gather rate by a further 20%.
+  tier: 2
+  prerequisites:
+  - {fileID: 11400000, guid: ee09fd76d5830cc48a73133c915f11db, type: 2}
+  oreCost: 0
+  biomassCost: 100
+  goldCost: 25
+  statType: 5
+  modifierType: 1
+  value: 0.2

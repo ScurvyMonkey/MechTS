@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5fce17d795d3ca449aaf0571dd812a0, type: 3}
+  m_Name: ResourceNode_Biomass
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.ResourceNodeDefinition
+  resourceType: 1
+  yieldAmount: 2500
+  scatterObjectPrefab: {fileID: 0}
+  scatterObjectCount: 75
+  scatterRadius: 2
+  useTieredScatterArt: 1
+  tierPrefabHigh: {fileID: 2607037067077080469, guid: 4bbb9ad3735cc77409bf30bfc07c4c4d, type: 3}
+  tierPrefabMid: {fileID: 3228068857814909408, guid: 92332c17713479245894dbc077aa96b3, type: 3}
+  tierPrefabLow: {fileID: 1793201123151800976, guid: 1507802a3cc910d4580803318a5dd0bf, type: 3}
+  tierThresholdHigh: 0.66
+  tierThresholdLow: 0.33

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5fce17d795d3ca449aaf0571dd812a0, type: 3}
+  m_Name: ResourceNode_Gold
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.ResourceNodeDefinition
+  resourceType: 2
+  yieldAmount: 2500
+  scatterObjectPrefab: {fileID: 0}
+  scatterObjectCount: 75
+  scatterRadius: 2
+  useTieredScatterArt: 1
+  tierPrefabHigh: {fileID: 2075528083516038021, guid: 949a5cc62164d7748ae9d95ef2589d7e, type: 3}
+  tierPrefabMid: {fileID: 3309333401894069642, guid: 13ee599b26b3c7642b4f74542c2c07c5, type: 3}
+  tierPrefabLow: {fileID: 5409520764464321603, guid: fdba598712dc0f74493ac3d7ad537396, type: 3}
+  tierThresholdHigh: 0.66
+  tierThresholdLow: 0.33

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8eb088402b504142970a2954a0e02b5, type: 3}
+  m_Name: DroneFactoryDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
+  displayName: Drone Factory
+  prefab: {fileID: 6519781200196750460, guid: 0bc67352120757848bfcfdf76d31fc63, type: 3}
+  oreCost: 20
+  biomassCost: 0
+  goldCost: 0
+  powerGenerated: 0
+  powerConsumed: 2
+  buildTime: 8
+  maxHealth: 100
+  visionRadius: 8
+  isDetectionCapable: 0
+  detectionRadius: 0
+  canProduceUnits: 1
+  producibleUnits:
+  - {fileID: 11400000, guid: 9c1c07bda66587941bf7676d63c92c83, type: 2}

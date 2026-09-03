@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e839ac5f9b6899846bfc8076d8c25502, type: 3}
+  m_Name: HarvesterProductionDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.UnitProductionDefinition
+  displayName: Harvester
+  prefab: {fileID: 2420039293705087983, guid: 323d6b0a135e18343abb1f6140d93c13, type: 3}
+  enemyPrefabOverride: {fileID: 672842226701326761, guid: f6d76a2cd9f7c2843a3b1005c0a9e1dc, type: 3}
+  oreCost: 15
+  biomassCost: 0
+  goldCost: 0
+  powerConsumed: 1
+  productionTime: 8

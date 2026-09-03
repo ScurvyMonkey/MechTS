@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8eb088402b504142970a2954a0e02b5, type: 3}
+  m_Name: EconomicBuildingDefinition
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingDefinition
+  displayName: Economic Building
+  prefab: {fileID: 1738221668630384198, guid: 990025e951b7b13458c35c1762f89c4f, type: 3}
+  oreCost: 10
+  biomassCost: 0
+  goldCost: 0
+  powerGenerated: 10
+  powerConsumed: 0
+  buildTime: 6
+  maxHealth: 80
+  visionRadius: 8
+  isDetectionCapable: 0
+  detectionRadius: 0
+  canProduceUnits: 1
+  producibleUnits:
+  - {fileID: 11400000, guid: 255437675bc1f8243a402bf90144aaaf, type: 2}

@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5887b55aa197246aafcaa5c651562d, type: 3}
+  m_Name: HumanDamage2
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.StatUpgradeDefinition
+  displayName: Damage II
+  description: Increases weapon damage by a further 15%.
+  tier: 2
+  prerequisites:
+  - {fileID: 11400000, guid: 865b03f46efae8a43a15802945258a20, type: 2}
+  oreCost: 100
+  biomassCost: 0
+  goldCost: 25
+  statType: 0
+  modifierType: 1
+  value: 0.15

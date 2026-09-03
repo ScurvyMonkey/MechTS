@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29fc7c24ee8f46d429d3e80f7c8b6727, type: 3}
+  m_Name: SaboteurConfig
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.SaboteurConfig
+  maxHealth: 30
+  moveSpeed: 4
+  sabotageRange: 1.5
+  sabotageChannelDuration: 3
+  oreCost: 100
+  biomassCost: 300
+  goldCost: 1000
+  powerConsumed: 1
