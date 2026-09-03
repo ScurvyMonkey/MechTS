@@ -33,6 +33,17 @@ namespace MechTS.Units
         /// </summary>
         private const float ArtYOffset = 0.03f;
 
+        /// <summary>
+        /// The real visual altitude a flying unit (<see cref="IsFlying"/>) renders at, applied
+        /// via <see cref="NavMeshAgent.baseOffset"/> in <see cref="Awake"/>. High enough to
+        /// clear <c>Platform_Tier1</c>'s ~2.5-unit top surface with margin — a flying unit's
+        /// own NavMesh Agent Type excludes terrain-category geometry entirely (issue #40), so
+        /// its path can legitimately cross straight through a platform's footprint; without a
+        /// real altitude it would visually clip through that solid geometry instead of flying
+        /// over it.
+        /// </summary>
+        private const float FlightAltitude = 3.5f;
+
         [SerializeField] private Faction _faction;
         [SerializeField] private bool _isFlying;
         [SerializeField] private float _visionRadius = 10f;
@@ -117,18 +128,26 @@ namespace MechTS.Units
 
         /// <summary>
         /// Caches the NavMeshAgent and Health references, disables agent-to-agent avoidance
-        /// for a flying unit (see <see cref="IsFlying"/>), and builds this unit's merged
-        /// faction/selection ring — a hollow ring, sized from this unit's own
-        /// <see cref="CapsuleCollider"/> radius where present, dim in the unit's faction
-        /// color at rest and brighter/larger when selected (see <see cref="SetSelected"/>).
-        /// Replaces the old separate filled-disc faction ring
-        /// (<c>FactionColor.CreateFactionRing</c>) and hidden-until-selected indicator —
-        /// merging them avoids stacking two overlapping rings under real sprite art.
+        /// and sets a real hover altitude for a flying unit (see <see cref="IsFlying"/>,
+        /// <see cref="FlightAltitude"/>), and builds this unit's merged faction/selection
+        /// ring — a hollow ring, sized from this unit's own <see cref="CapsuleCollider"/>
+        /// radius where present, dim in the unit's faction color at rest and brighter/larger
+        /// when selected (see <see cref="SetSelected"/>). Replaces the old separate
+        /// filled-disc faction ring (<c>FactionColor.CreateFactionRing</c>) and
+        /// hidden-until-selected indicator — merging them avoids stacking two overlapping
+        /// rings under real sprite art.
         /// </summary>
         protected virtual void Awake()
         {
             Agent = GetComponent<NavMeshAgent>();
             HealthComponent = GetComponent<Health>();
+
+            // Every real 3D model's Art child is base-anchored at local (0,0,0) (see
+            // CLAUDE.md's 3D Model Conversion Convention), so a ground unit must render flush
+            // with the NavMesh; a flying unit gets a real, deliberate hover altitude instead.
+            // Driven from code, not each prefab's own serialized default, so this can't go
+            // stale again the way it did before issue #85.
+            Agent.baseOffset = _isFlying ? FlightAltitude : 0f;
 
             if (_isFlying)
             {
