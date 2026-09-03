@@ -1329,9 +1329,22 @@ Assets/Scripts/
                  spawns starter units on Play Mode entry)
 
 Assets/Editor/ — first Editor-tooling script in this project (issue #18, shipped 2026-08-19):
-MapEditorWindow (custom EditorWindow + Scene View tool, MechTS/Map Editor menu item). Any script
-placed under a folder literally named Editor/ (anywhere in the hierarchy) is automatically
-Editor-only and excluded from player builds — no .asmdef needed for that. NavMeshBakeUtility
+MapEditorWindow (custom EditorWindow + Scene View tool, MechTS/Map Editor menu item) — split
+(issue #87, shipped 2026-09-03) into window lifecycle/GUI/input-routing only, composing
+MapEditorPainter (paint/erase mechanics, MapContent category-folder management, a plain class
+the window constructs once and holds as a private field — not a second EditorWindow, not a
+singleton) and MapEditorPreview (Scene View preview-gizmo drawing, a static utility class since
+it holds no state), once the window's own responsibilities had grown past a single file across
+13+ prior issues (#18, #35, #40, #56, #63, #70-75, #77, #86). Mirrors the EconomyManager →
+EconomyRegistry/UnitUpkeepTracker composition precedent (issue #61). Zero intended behavior
+change — verified via direct calls against the real extracted classes (an improvement over the
+window's own private methods, which this project's unity-mcp sessions can't reflection-invoke
+reliably): a variants-only brush's paintability, TryErase correctly matching a forced non-first
+prefabVariants entry (the exact regression issue #86's /arch review flagged), the Terrain-category
+Y-force (a deliberately wrong input Y=3 correctly forced to 0), and grid-snap (an unaligned
+(33.3, 47.7) input correctly snapped to (32, 48) at gridSize=8) all confirmed against real scene
+state. Any script placed under a folder literally named Editor/ (anywhere in the hierarchy) is
+automatically Editor-only and excluded from player builds — no .asmdef needed for that. NavMeshBakeUtility
 (issue #35, MechTS/Bake NavMesh menu item) bakes at a finer voxel size than the project default
 and writes the result into the scene's persisted NavMesh.asset — see the Terrain Elevation entry
 above; use this instead of the Navigation window's Bake button on any map with elevation.
