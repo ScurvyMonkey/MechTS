@@ -1,0 +1,6 @@
+# Patterns
+
+### [2026-09-09] — Dev — Terrain Detail Mesh prototypes are pure data, no code path (issue #88)
+**Context:** Registered the remaining 17 of 20 vegetation prefabs as `TerrainData.detailPrototypes` entries on `OutdoorTerrainData`.
+**Learning:** This is 100% Editor-time `TerrainData` asset content (`DetailPrototype` struct array) — no ScriptableObject, no MonoBehaviour, nothing in `Assets/Scripts/` reads or references it. `DetailPrototype`'s C# default constructor already matches the `healthyColor`/`dryColor`/`targetCoverage` values the 3 pre-existing hand-configured entries had (confirmed by reading both back) — don't bother explicitly setting those fields to "match convention," the defaults already do. Only `minWidth`/`maxWidth`/`minHeight`/`maxHeight` (and `usePrototypeMesh`/`useInstancing`/`renderMode`/`noiseSpread`/`useDensityScaling`, which do differ from C# defaults) needed explicit values.
+**Apply when:** Any future Terrain Detail Mesh (or other `TerrainData` sub-asset) work in this project — check the live asset's actual field values via `unity-mcp` before assuming what "matching the existing convention" requires; some fields may already be free via the API's own defaults.
