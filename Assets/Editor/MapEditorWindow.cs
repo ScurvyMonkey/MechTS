@@ -122,9 +122,9 @@ namespace MechTS.EditorTools
         /// Handles Scene View mouse input: left-click/drag paints the selected brush,
         /// right-click/drag erases the nearest painted object under the cursor. No-ops
         /// entirely during Play Mode, since this is a level-authoring tool only. Resolves the
-        /// raw Ground-layer raycast point and dispatches to <see cref="MapEditorPainter"/> —
-        /// brush-specific position resolution (Terrain Y-force, grid-snap) now lives there
-        /// (issue #87), not here.
+        /// raw surface raycast point (see <see cref="MapEditorPainter.SurfaceLayerNames"/>)
+        /// and dispatches to <see cref="MapEditorPainter"/> — brush-specific position
+        /// resolution (Terrain Y-force, grid-snap) now lives there (issue #87), not here.
         /// </summary>
         /// <param name="sceneView">The Scene View this GUI callback is for.</param>
         private void OnSceneGUI(SceneView sceneView)
@@ -169,19 +169,19 @@ namespace MechTS.EditorTools
 
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
 
-            // A real physics raycast against the Ground layer (issue #35) — rather than the
-            // flat Y=0 math plane issue #18 originally used — so painting resolves the actual
-            // surface height under the cursor, including an elevated Platform_Tier1's top or
-            // a Ramp's sloped surface, not just bare Ground. Both new terrain prefabs are on
-            // this same layer specifically so this one raycast covers all three.
+            // A real physics raycast against every surface layer (issue #35; extended to also
+            // include Environment by issue #89) — rather than the flat Y=0 math plane issue
+            // #18 originally used — so painting resolves the actual surface height under the
+            // cursor: an elevated Platform_Tier1's top, a Ramp's sloped surface, sculpted
+            // OutdoorTerrain elevation, or bare flat ground, whichever is physically nearest.
             // SyncTransforms is required here, confirmed directly: a collider from a brush
             // painted moments earlier in the same session is NOT yet visible to
             // Physics.Raycast in Edit Mode without this — e.g. painting a building brush
             // immediately after painting the Platform underneath it would otherwise silently
-            // resolve against bare Ground (Y=0) instead of the Platform's real top surface.
+            // resolve against bare ground instead of the Platform's real top surface.
             Physics.SyncTransforms();
-            int groundLayerMask = LayerMask.GetMask(MapEditorPainter.GroundLayerName);
-            if (!Physics.Raycast(ray, out RaycastHit hit, MapEditorPainter.MaxRaycastDistance, groundLayerMask)) return;
+            int surfaceLayerMask = LayerMask.GetMask(MapEditorPainter.SurfaceLayerNames);
+            if (!Physics.Raycast(ray, out RaycastHit hit, MapEditorPainter.MaxRaycastDistance, surfaceLayerMask)) return;
 
             // Claim the event so painting/erasing doesn't also orbit the Scene View camera
             // or try to select objects underneath the cursor.

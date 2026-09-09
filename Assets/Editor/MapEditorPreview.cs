@@ -19,10 +19,10 @@ namespace MechTS.EditorTools
 
         /// <summary>
         /// Draws a wire-circle gizmo previewing a splash brush's scatter radius at the
-        /// cursor's currently-resolved Ground-layer surface position, so the designer can see
-        /// the scatter area before clicking. Called every Scene View event while a splash
-        /// brush is selected (see the hover-tracking note in <see cref="MapEditorWindow.OnSceneGUI"/>),
-        /// not just during an actual paint/erase action.
+        /// cursor's currently-resolved surface position (see <see cref="MapEditorPainter.SurfaceLayerNames"/>),
+        /// so the designer can see the scatter area before clicking. Called every Scene View
+        /// event while a splash brush is selected (see the hover-tracking note in
+        /// <see cref="MapEditorWindow.OnSceneGUI"/>), not just during an actual paint/erase action.
         /// </summary>
         /// <param name="e">The current Scene View GUI event, used to resolve the cursor's screen position.</param>
         /// <param name="brush">The currently selected splash brush.</param>
@@ -30,8 +30,8 @@ namespace MechTS.EditorTools
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
             Physics.SyncTransforms();
-            int groundLayerMask = LayerMask.GetMask(MapEditorPainter.GroundLayerName);
-            if (!Physics.Raycast(ray, out RaycastHit hit, MapEditorPainter.MaxRaycastDistance, groundLayerMask)) return;
+            int surfaceLayerMask = LayerMask.GetMask(MapEditorPainter.SurfaceLayerNames);
+            if (!Physics.Raycast(ray, out RaycastHit hit, MapEditorPainter.MaxRaycastDistance, surfaceLayerMask)) return;
 
             Handles.color = Color.cyan;
             Handles.DrawWireDisc(hit.point, Vector3.up, brush.splashRadius);
@@ -51,8 +51,8 @@ namespace MechTS.EditorTools
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
             Physics.SyncTransforms();
-            int groundLayerMask = LayerMask.GetMask(MapEditorPainter.GroundLayerName);
-            if (!Physics.Raycast(ray, out RaycastHit hit, MapEditorPainter.MaxRaycastDistance, groundLayerMask)) return;
+            int surfaceLayerMask = LayerMask.GetMask(MapEditorPainter.SurfaceLayerNames);
+            if (!Physics.Raycast(ray, out RaycastHit hit, MapEditorPainter.MaxRaycastDistance, surfaceLayerMask)) return;
 
             Vector3 worldPoint = hit.point;
             if (brush.category == MapEditorPainter.TerrainCategory) worldPoint.y = 0f;

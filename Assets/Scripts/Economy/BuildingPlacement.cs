@@ -27,6 +27,10 @@ namespace MechTS.Economy
     /// </summary>
     public class BuildingPlacement : MonoBehaviour
     {
+        // Inspector-configured to include both Ground (bare ground + Map-Editor-painted
+        // Platform_Tier1/Ramp, issue #35) and Environment (OutdoorTerrain's TerrainCollider,
+        // issue #89) — a raycast against both resolves to whichever surface is physically
+        // nearest, so placement follows real sculpted elevation as well as platforms.
         [SerializeField] private LayerMask _groundLayerMask;
         [SerializeField] private LayerMask _buildingLayerMask;
         [SerializeField] private Faction _localFaction = Faction.Player;

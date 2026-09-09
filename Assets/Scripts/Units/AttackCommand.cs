@@ -20,6 +20,9 @@ namespace MechTS.Units
     public class AttackCommand : MonoBehaviour
     {
         [SerializeField] private LayerMask _targetableLayerMask;
+        // Inspector-configured to include both Ground (bare ground + Map-Editor-painted
+        // Platform_Tier1/Ramp, issue #35) and Environment (OutdoorTerrain's TerrainCollider,
+        // issue #89) — every resolver below receives this same combined mask.
         [SerializeField] private LayerMask _groundLayerMask;
         [SerializeField] private LayerMask _resourceNodeLayerMask;
 

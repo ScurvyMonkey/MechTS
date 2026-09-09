@@ -16,7 +16,17 @@ namespace MechTS.EditorTools
     /// </summary>
     public class MapEditorPainter
     {
-        public const string GroundLayerName = "Ground";
+        /// <summary>
+        /// Layers combined for every Map Editor placement/erase surface-height raycast —
+        /// <c>Ground</c> (Map-Editor-painted <c>Platform_Tier1</c>/<c>Ramp</c> instances,
+        /// issue #35 — the old flat <c>Ground</c> GameObject itself was retired in issue #89,
+        /// but everything else already placed on that layer is untouched) and
+        /// <c>Environment</c> (<c>OutdoorTerrain</c>'s own <c>TerrainCollider</c>, issue #89).
+        /// A plain raycast against both naturally resolves to whichever surface is physically
+        /// nearest the ray origin — a Platform edge, a sculpted hill, or bare (flat) terrain
+        /// all resolve correctly with no special per-source logic needed.
+        /// </summary>
+        public static readonly string[] SurfaceLayerNames = { "Ground", "Environment" };
         public const string TerrainCategory = "Terrain";
         public const float MaxRaycastDistance = 1000f;
 
@@ -181,7 +191,7 @@ namespace MechTS.EditorTools
         /// above its own randomized XZ position — not a reuse of the cursor's own screen-space
         /// ray, which only has meaning for the actual mouse position — so a splash painted near
         /// a Platform_Tier1/Ramp edge (issue #35) correctly places each instance on whatever
-        /// surface is actually beneath it. An instance whose raycast misses the Ground layer
+        /// surface is actually beneath it. An instance whose raycast misses the surface layer
         /// entirely (e.g. an offset landing past the map's edge) is silently skipped.
         /// Candidate XZ offsets are rejection-sampled against every already-placed instance in
         /// this same batch, requiring at least <see cref="SplashSpacingFraction"/> of the
@@ -197,11 +207,11 @@ namespace MechTS.EditorTools
         /// the configured <see cref="MapBrushDefinition.splashCount"/>.
         /// </summary>
         /// <param name="brush">The brush to paint.</param>
-        /// <param name="originPoint">The Ground-layer surface world position the scatter is centered on.</param>
+        /// <param name="originPoint">The surface-layer world position the scatter is centered on.</param>
         private void PaintSplash(MapBrushDefinition brush, Vector3 originPoint)
         {
             var parent = GetOrCreateCategoryParent(brush.category);
-            int groundLayerMask = LayerMask.GetMask(GroundLayerName);
+            int surfaceLayerMask = LayerMask.GetMask(SurfaceLayerNames);
             var placedXZ = new List<Vector2>();
             // A fraction of the brush's own splashRadius, not a flat constant — this keeps the
             // spacing proportional to whatever a given brush is already tuned to (a small-object
@@ -227,7 +237,7 @@ namespace MechTS.EditorTools
                 placedXZ.Add(offset);
 
                 Vector3 rayOrigin = new Vector3(originPoint.x + offset.x, originPoint.y + SplashRaycastHeight, originPoint.z + offset.y);
-                if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, MaxRaycastDistance, groundLayerMask)) continue;
+                if (!Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, MaxRaycastDistance, surfaceLayerMask)) continue;
 
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(ResolvePrefab(brush), parent.transform);
                 instance.transform.position = hit.point;

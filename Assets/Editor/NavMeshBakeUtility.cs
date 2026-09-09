@@ -57,7 +57,32 @@ namespace MechTS.EditorTools
         /// flat baseline a ground unit would need a ramp to reach, rather than attempting to
         /// make the cliff's own geometry "climbable" (confirmed via direct testing that no
         /// climb/slope tuning can make Recast treat a vertical wall as traversable terrain —
-        /// see the issue #40 completion notes). Filtering post-collection rather than toggling
+        /// see the issue #40 completion notes).
+        /// <para>
+        /// <b>Issue #89 deliberately does NOT extend this exclusion to <c>OutdoorTerrain</c>'s
+        /// own sculpted-heightmap source, despite that being the original plan.</b> Tried and
+        /// reverted after direct testing: with the old flat <c>Ground</c> GameObject retired
+        /// (issue #89 — raycasts and NavMesh both moved to <c>OutdoorTerrain</c> as the real
+        /// surface), excluding Terrain from the Flying bake left it with <i>zero</i> walkable
+        /// geometry anywhere on the map, not just near sculpted elevation — Ground had been
+        /// Flying's only other full-map-coverage source, and there is nothing left to fall
+        /// back to once both are gone. Terrain doesn't create the same problem Platform_Tier1/
+        /// Ramp does: a platform is a small, isolated obstacle sitting <i>on top of</i> an
+        /// otherwise-flat, always-present surface, so excluding it restores a real flat
+        /// pass-through underneath. Terrain <i>is</i> the surface itself — there's no "flat
+        /// underneath" to fall back to once it's excluded. Recast's own slope-based
+        /// voxelization already keeps a too-steep Terrain slope out of Flying's walkable mesh
+        /// exactly the way it already excludes Platform_Tier1's cliff faces from Humanoid's
+        /// (issue #35) — both agent types currently share the same 45° <c>agentSlope</c>
+        /// setting, so Flying gets no special steep-terrain bypass today. If a future mission's
+        /// sculpting creates a genuinely Flying-blocking slope, that's a real follow-up (a
+        /// higher <c>agentSlope</c> on the Flying agent type is the likely fix, since — unlike
+        /// Platform_Tier1's literal vertical wall, which issue #40 already proved can't be
+        /// tuned around — a heightmap-based slope is never actually vertical, so a more
+        /// permissive slope tolerance may well resolve it), not something this issue needed to
+        /// solve pre-emptively.
+        /// </para>
+        /// Filtering post-collection rather than toggling
         /// each object's <c>NavigationStatic</c> flag before collecting is deliberate — that
         /// flag change was confirmed live to not actually affect <see cref="NavMeshBuilder.CollectSources"/>'s
         /// result within the same Editor session (read back as correctly cleared, sources
