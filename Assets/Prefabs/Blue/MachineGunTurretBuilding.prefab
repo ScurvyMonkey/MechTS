@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1842317659421287415}
   - component: {fileID: 4854737022135201685}
   - component: {fileID: 3611378858708279263}
+  - component: {fileID: 2816144180339194502}
   m_Layer: 9
   m_Name: MachineGunTurretBuilding
   m_TagString: Untagged
@@ -98,6 +99,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.Weapon
   _config: {fileID: 11400000, guid: e72350aefe0b84740bff783afa4ac690, type: 2}
   _muzzle: {fileID: 0}
+--- !u!114 &2816144180339194502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4354762238693365027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20502f5c001b31147bba87a118fcf2fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.WeaponFireAnimator
+  _activeWindowSeconds: 0.3
+  _animators:
+  - {fileID: 7564934770474551404}
 --- !u!1001 &7564934770484051212
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -155,6 +171,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d530c79fbd60d5e42a9a39a8a4001f77, type: 3}
+--- !u!95 &7564934770474551404 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: d530c79fbd60d5e42a9a39a8a4001f77, type: 3}
+  m_PrefabInstance: {fileID: 7564934770484051212}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7564934770484176780 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: d530c79fbd60d5e42a9a39a8a4001f77, type: 3}

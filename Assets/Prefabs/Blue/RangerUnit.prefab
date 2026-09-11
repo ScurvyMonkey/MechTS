@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7795803573847507158}
   - component: {fileID: 5638701463175307308}
   - component: {fileID: 7333016176139147074}
+  - component: {fileID: 4695251755809303133}
   m_Layer: 9
   m_Name: RangerUnit
   m_TagString: Untagged
@@ -138,6 +139,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.CombatUnitStats
   _config: {fileID: 11400000, guid: 8e6e8108b76046e409a7d14510684116, type: 2}
+--- !u!114 &4695251755809303133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7325832443099744918}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20502f5c001b31147bba87a118fcf2fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.WeaponFireAnimator
+  _activeWindowSeconds: 0.3
+  _animators:
+  - {fileID: 2164671935897751347}
+  - {fileID: 2164671935897751345}
 --- !u!1001 &2164671935905118801
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -146,9 +163,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6926884258057252485}
     m_Modifications:
+    - target: {fileID: 100006, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 100054, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
       propertyPath: m_Name
       value: Art
+      objectReference: {fileID: 0}
+    - target: {fileID: 100096, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 400054, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -195,6 +220,16 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
+--- !u!95 &2164671935897751345 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
+  m_PrefabInstance: {fileID: 2164671935905118801}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &2164671935897751347 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500002, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}
+  m_PrefabInstance: {fileID: 2164671935905118801}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2164671935905505511 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400054, guid: 1bef8fae298030e4d8e649eca2d50a17, type: 3}

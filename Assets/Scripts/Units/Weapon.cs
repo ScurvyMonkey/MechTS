@@ -1,3 +1,4 @@
+using System;
 using MechTS.Core;
 using MechTS.Economy;
 using MechTS.Vision;
@@ -25,6 +26,14 @@ namespace MechTS.Units
 
         /// <summary>This weapon's tunable stats, for display (e.g. the unit detail panel).</summary>
         public WeaponConfig Config => _config;
+
+        /// <summary>
+        /// Raised every time this weapon actually fires a shot (issue #91) — the single choke
+        /// point every shot passes through, <see cref="FireAt"/>. A weapon-fire-gated animator
+        /// component subscribes to this to play a unit/building's real fire animation in sync
+        /// with actual shots, rather than continuously or never.
+        /// </summary>
+        public event Action OnFired;
 
         private UnitManager _unitManager;
         private EconomyManager _economyManager;
@@ -199,12 +208,14 @@ namespace MechTS.Units
         }
 
         /// <summary>
-        /// Applies damage, plays the firing sound, and spawns this shot's firing effects
-        /// (bullet flight, casing eject), if their pools were built.
+        /// Raises <see cref="OnFired"/>, applies damage, plays the firing sound, and spawns
+        /// this shot's firing effects (bullet flight, casing eject), if their pools were built.
         /// </summary>
         /// <param name="target">The target being hit.</param>
         private void FireAt(Health target)
         {
+            OnFired?.Invoke();
+
             float damageTypeMultiplier = GetStatMultiplier(DamageTypeStat(_config.damageType));
             target.Damage(_config.damage * GetStatMultiplier(UpgradeStatType.Damage) * damageTypeMultiplier, gameObject, _config.damageType);
 

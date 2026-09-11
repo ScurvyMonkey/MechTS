@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 3166187826888461612}
   - component: {fileID: 2705644973484962018}
   - component: {fileID: 235043240494728445}
+  - component: {fileID: 8474719864900291253}
   m_Layer: 9
   m_Name: ReaperUnit
   m_TagString: Untagged
@@ -138,6 +139,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.CombatUnitStats
   _config: {fileID: 11400000, guid: 4f0fd0283714e9643be61c0f7676a0d1, type: 2}
+--- !u!114 &8474719864900291253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 608522076886329636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20502f5c001b31147bba87a118fcf2fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.WeaponFireAnimator
+  _activeWindowSeconds: 0.3
+  _animators:
+  - {fileID: 4652057445886653696}
 --- !u!1001 &4652057445879251040
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -198,5 +214,10 @@ PrefabInstance:
 --- !u!4 &4652057445879651044 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 96cb8b8740f61d64089ee9c8f8f613d8, type: 3}
+  m_PrefabInstance: {fileID: 4652057445879251040}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &4652057445886653696 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 96cb8b8740f61d64089ee9c8f8f613d8, type: 3}
   m_PrefabInstance: {fileID: 4652057445879251040}
   m_PrefabAsset: {fileID: 0}
