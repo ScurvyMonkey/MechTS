@@ -119,6 +119,14 @@ namespace MechTS.Units
         public Health HealthComponent { get; private set; }
 
         /// <summary>
+        /// This unit's weapon component, if it has one, cached (issue #90) so UI/inspection
+        /// code (e.g. <see cref="MechTS.UI.SelectionPanel"/>) never needs a per-frame
+        /// GetComponent lookup — mirrors <see cref="HarvesterUnit.GatherBehavior"/>'s existing
+        /// cached-property shape.
+        /// </summary>
+        public Weapon Weapon { get; private set; }
+
+        /// <summary>
         /// This unit's capability flags (issue #39), computed once in <see cref="Awake"/>
         /// from existing signals — never separately authored, so it can't drift out of sync
         /// with what the unit actually is. Passed to <see cref="Economy.TechManager.GetStatMultiplier"/>
@@ -173,14 +181,14 @@ namespace MechTS.Units
         {
             var capabilities = _isFlying ? UnitCapability.Flying : UnitCapability.Ground;
 
-            var weapon = GetComponent<Weapon>();
-            if (weapon != null && weapon.Config != null)
+            Weapon = GetComponent<Weapon>();
+            if (Weapon != null && Weapon.Config != null)
             {
-                if (weapon.Config.targetType == WeaponTargetType.Ground || weapon.Config.targetType == WeaponTargetType.GroundAndAir)
+                if (Weapon.Config.targetType == WeaponTargetType.Ground || Weapon.Config.targetType == WeaponTargetType.GroundAndAir)
                 {
                     capabilities |= UnitCapability.GroundAttacker;
                 }
-                if (weapon.Config.targetType == WeaponTargetType.Air || weapon.Config.targetType == WeaponTargetType.GroundAndAir)
+                if (Weapon.Config.targetType == WeaponTargetType.Air || Weapon.Config.targetType == WeaponTargetType.GroundAndAir)
                 {
                     capabilities |= UnitCapability.AirAttacker;
                 }

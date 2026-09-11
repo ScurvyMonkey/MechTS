@@ -122,12 +122,12 @@ namespace MechTS.UI
                 || currentEnemyUnit != _detailEnemyUnit || currentEnemyBuilding != _detailEnemyBuilding || currentEnemyMainBuilding != _detailEnemyMainBuilding)
             {
                 _detailUnit = currentUnit;
-                _detailWeapon = currentUnit != null ? currentUnit.GetComponent<Weapon>() : null;
+                _detailWeapon = currentUnit != null ? currentUnit.Weapon : null;
                 _detailBuilding = currentBuilding;
                 _detailMainBuilding = currentMainBuilding;
                 _detailResourceNode = currentResourceNode;
                 _detailEnemyUnit = currentEnemyUnit;
-                _detailEnemyWeapon = currentEnemyUnit != null ? currentEnemyUnit.GetComponent<Weapon>() : null;
+                _detailEnemyWeapon = currentEnemyUnit != null ? currentEnemyUnit.Weapon : null;
                 _detailEnemyBuilding = currentEnemyBuilding;
                 _detailEnemyMainBuilding = currentEnemyMainBuilding;
 
