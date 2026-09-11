@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5756922841310767233}
   - component: {fileID: 269382132632873705}
   - component: {fileID: 4536022663730883307}
+  - component: {fileID: 6576740284743380389}
   m_Layer: 9
   m_Name: EconomicBuilding
   m_TagString: Untagged
@@ -96,6 +97,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f884370fb955f4cac4f089033089f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.ProductionQueue
+--- !u!114 &6576740284743380389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1738221668630384198}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b12f5954851584148b1e106d47bd7280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingIdleAnimator
+  _animator: {fileID: 2046806067867818407}
 --- !u!1001 &2046806067877309639
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -153,6 +167,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 052fa8c1b43cc3f4ca3c554cc921987f, type: 3}
+--- !u!95 &2046806067867818407 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 052fa8c1b43cc3f4ca3c554cc921987f, type: 3}
+  m_PrefabInstance: {fileID: 2046806067877309639}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2046806067877705283 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400004, guid: 052fa8c1b43cc3f4ca3c554cc921987f, type: 3}

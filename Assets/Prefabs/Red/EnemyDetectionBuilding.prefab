@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6589112542602088024}
   - component: {fileID: 77654148441567925}
   - component: {fileID: 1100555386894534261}
+  - component: {fileID: 511361395272048190}
   m_Layer: 9
   m_Name: EnemyDetectionBuilding
   m_TagString: Untagged
@@ -98,6 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Units.Weapon
   _config: {fileID: 11400000, guid: cae8074ce9658024c8d4e21a48ef324d, type: 2}
   _muzzle: {fileID: 0}
+--- !u!114 &511361395272048190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3241317669837460746}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b12f5954851584148b1e106d47bd7280, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.BuildingIdleAnimator
+  _animator: {fileID: 8689620069002091168}
 --- !u!1001 &8689620068992643008
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -158,5 +172,10 @@ PrefabInstance:
 --- !u!4 &8689620068993037642 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400010, guid: 797800c86f78e78409602aa0e33b7133, type: 3}
+  m_PrefabInstance: {fileID: 8689620068992643008}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8689620069002091168 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 797800c86f78e78409602aa0e33b7133, type: 3}
   m_PrefabInstance: {fileID: 8689620068992643008}
   m_PrefabAsset: {fileID: 0}
