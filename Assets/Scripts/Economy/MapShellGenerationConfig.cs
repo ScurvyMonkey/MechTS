@@ -4,10 +4,14 @@ namespace MechTS.Economy
 {
     /// <summary>
     /// Tunable parameters for <c>MapShellGenerator</c> (see <c>Assets/Editor/</c>) — a
-    /// procedural terrain-shell pass (elevation, cliffs/platforms, foliage) run once per
-    /// generation, not a runtime system. ScriptableObject-first per convention so a future
-    /// named preset (e.g. a "Canyon" vs. "Plains" style) is authoring a second asset, not a
-    /// code change — v1 ships with one default config, presets are out of scope for now.
+    /// procedural environment/terrain-shell pass (elevation, ground texture, foliage) run once
+    /// per generation, not a runtime system. Scope narrowed to terrain/foliage only in issue
+    /// #95 — the first version also placed <c>Platform_Tier1</c>/<c>Ramp</c> clusters, but
+    /// naive offset placement never connected them properly (those pieces need precise
+    /// hand-placement, issue #35), so cliff/platform generation was dropped entirely rather
+    /// than half-solved. ScriptableObject-first per convention so a future named preset (e.g.
+    /// a "Canyon" vs. "Plains" style) is authoring a second asset, not a code change — v1 ships
+    /// with one default config, presets are out of scope for now.
     /// </summary>
     [CreateAssetMenu(menuName = "MechTS/Map Editor/Map Shell Generation Config")]
     public class MapShellGenerationConfig : ScriptableObject
@@ -21,14 +25,6 @@ namespace MechTS.Economy
         /// <summary>World-unit height range the generated terrain is remapped into.</summary>
         public float minHeight;
         public float maxHeight = 6f;
-
-        [Header("Cliffs / Platforms")]
-        public MapBrushDefinition platformBrush;
-        public MapBrushDefinition rampBrush;
-        public int platformCount = 4;
-
-        /// <summary>Minimum distance kept between platform clusters, and between a cluster and any foliage placement.</summary>
-        public float platformSpacing = 15f;
 
         [Header("Foliage")]
         public MapBrushDefinition[] foliageBrushes;

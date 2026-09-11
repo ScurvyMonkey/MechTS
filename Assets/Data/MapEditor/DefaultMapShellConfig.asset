@@ -16,10 +16,6 @@ MonoBehaviour:
   noiseScale: 0.05
   minHeight: 0
   maxHeight: 6
-  platformBrush: {fileID: 11400000, guid: 251e9bf28375dcb49b1223338a4e4230, type: 2}
-  rampBrush: {fileID: 11400000, guid: 641428d117aeda24882b203811f8105d, type: 2}
-  platformCount: 4
-  platformSpacing: 15
   foliageBrushes:
   - {fileID: 11400000, guid: ccc016fb2a5f9394a86151ad2605e98a, type: 2}
   - {fileID: 11400000, guid: aefbe9a3b7d363f42907fa73e3d0a657, type: 2}

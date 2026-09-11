@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using MechTS.Economy;
 using UnityEditor;
 using UnityEngine;
@@ -6,15 +5,20 @@ using UnityEngine;
 namespace MechTS.EditorTools
 {
     /// <summary>
-    /// Generates a randomized terrain "shell" — sculpted elevation, cliff/platform clusters,
-    /// and foliage scatter — onto the scene's <c>OutdoorTerrain</c> in one pass (issue #94), so
-    /// a designer can start map-building from a varied base instead of blank flat terrain. Pure
-    /// Editor-time tooling, same category as <see cref="MapEditorWindow"/>/<see cref="NavMeshBakeUtility"/> —
-    /// no runtime code path. Every placement goes through <see cref="MapEditorPainter.TryPaint"/>,
+    /// Generates a randomized terrain "shell" — sculpted elevation and foliage scatter — onto
+    /// the scene's <c>OutdoorTerrain</c> in one pass (issue #94), so a designer can start
+    /// map-building from a varied base instead of blank flat terrain. Pure Editor-time tooling,
+    /// same category as <see cref="MapEditorWindow"/>/<see cref="NavMeshBakeUtility"/> — no
+    /// runtime code path. Foliage placement goes through <see cref="MapEditorPainter.TryPaint"/>,
     /// the same entry point a designer's own mouse click uses, so generated content is ordinary,
     /// fully editable/erasable scene content afterward — nothing here is special-cased as
-    /// "generated." Resource nodes, <c>PlayerStartPoint</c>s, and buildings are never touched —
-    /// those stay entirely manual, per the issue's explicit scope.
+    /// "generated." Resource nodes, <c>PlayerStartPoint</c>s, buildings, and — as of issue #95 —
+    /// <c>Platform_Tier1</c>/<c>Ramp</c> clusters are never touched; the first version of this
+    /// tool did place Platform/Ramp clusters, but naive offset placement (no rotation, no
+    /// awareness of either prefab's actual footprint) never produced a properly-connected
+    /// result — those pieces are modular content meant for precise hand-placement (issue #35),
+    /// and this tool doesn't attempt automatic geometry-aware alignment for them. Scope narrowed
+    /// to environment/terrain only, per direct designer feedback the same day.
     /// </summary>
     public class MapShellGenerator : EditorWindow
     {
@@ -51,16 +55,16 @@ namespace MechTS.EditorTools
                 bool proceed = EditorUtility.DisplayDialog(
                     "Generate Map Shell",
                     "This overwrites OutdoorTerrain's height, texture, and Detail Mesh data, and adds new " +
-                    "Platform/Ramp/foliage instances. Existing hand-placed scene content is never removed. Continue?",
+                    "foliage instances. Existing hand-placed scene content is never removed. Continue?",
                     "Generate", "Cancel");
                 if (proceed) Generate(_config);
             }
         }
 
         /// <summary>
-        /// Runs the full generation pass: heightmap, layer blending, platform/ramp clusters,
-        /// foliage scatter, and Detail Mesh vegetation, all seeded from
-        /// <see cref="MapShellGenerationConfig.seed"/> so the same config reproduces the same result.
+        /// Runs the full generation pass: heightmap, layer blending, foliage scatter, and
+        /// Detail Mesh vegetation, all seeded from <see cref="MapShellGenerationConfig.seed"/>
+        /// so the same config reproduces the same result.
         /// </summary>
         /// <param name="config">The generation parameters to use.</param>
         private void Generate(MapShellGenerationConfig config)
@@ -80,13 +84,12 @@ namespace MechTS.EditorTools
             GenerateHeights(data, config, rng);
             BlendLayers(data);
 
-            var platformPositions = PlacePlatforms(config, rng, terrain.transform.position, data, painter);
-            PlaceFoliage(config, rng, terrain.transform.position, data, platformPositions, painter);
+            int foliageCount = PlaceFoliage(config, rng, terrain.transform.position, data, painter);
             PopulateDetailScatter(data, config, rng);
 
             EditorUtility.SetDirty(data);
             AssetDatabase.SaveAssets();
-            Debug.Log($"MechTS: Map shell generated (seed={config.seed}) — {platformPositions.Count} platform cluster(s) placed.");
+            Debug.Log($"MechTS: Map shell generated (seed={config.seed}) — {foliageCount} foliage cluster(s) placed.");
         }
 
         /// <summary>
@@ -177,50 +180,15 @@ namespace MechTS.EditorTools
         }
 
         /// <summary>
-        /// Places <see cref="MapShellGenerationConfig.platformCount"/> Platform+Ramp clusters at
-        /// random, mutually non-overlapping positions (a simple minimum-spacing rejection sample —
-        /// no existing overlap-checking code applies to Terrain-category content, so this is new,
-        /// self-contained logic, not reused). Placement itself goes through
-        /// <see cref="MapEditorPainter.TryPaint"/>, exactly like a designer's own click.
-        /// </summary>
-        /// <returns>The XZ positions of every platform actually placed, for <see cref="PlaceFoliage"/> to avoid.</returns>
-        private List<Vector3> PlacePlatforms(MapShellGenerationConfig config, System.Random rng, Vector3 terrainOrigin, TerrainData data, MapEditorPainter painter)
-        {
-            var placed = new List<Vector3>();
-            if (config.platformBrush == null) return placed;
-
-            int maxAttempts = config.platformCount * 20;
-            for (int attempt = 0; attempt < maxAttempts && placed.Count < config.platformCount; attempt++)
-            {
-                float x = terrainOrigin.x + (float)rng.NextDouble() * data.size.x;
-                float z = terrainOrigin.z + (float)rng.NextDouble() * data.size.z;
-                var candidate = new Vector3(x, 0f, z);
-
-                if (IsTooClose(candidate, placed, config.platformSpacing)) continue;
-
-                painter.TryPaint(config.platformBrush, candidate, 0f);
-                painter.EndDrag();
-                placed.Add(candidate);
-
-                if (config.rampBrush != null)
-                {
-                    var rampPos = candidate + new Vector3(config.platformSpacing * 0.3f, 0f, 0f);
-                    painter.TryPaint(config.rampBrush, rampPos, 0f);
-                    painter.EndDrag();
-                }
-            }
-            return placed;
-        }
-
-        /// <summary>
         /// Scatters <see cref="MapShellGenerationConfig.foliageClusterCount"/> splash-brush
         /// clusters (drawn randomly from <see cref="MapShellGenerationConfig.foliageBrushes"/>)
-        /// across the terrain, skipping candidates on too-steep slopes or too close to a
-        /// placed platform.
+        /// across the terrain, skipping candidates on too-steep slopes. Placement goes through
+        /// <see cref="MapEditorPainter.TryPaint"/>, exactly like a designer's own click.
         /// </summary>
-        private void PlaceFoliage(MapShellGenerationConfig config, System.Random rng, Vector3 terrainOrigin, TerrainData data, List<Vector3> platformPositions, MapEditorPainter painter)
+        /// <returns>The number of foliage clusters actually placed.</returns>
+        private int PlaceFoliage(MapShellGenerationConfig config, System.Random rng, Vector3 terrainOrigin, TerrainData data, MapEditorPainter painter)
         {
-            if (config.foliageBrushes == null || config.foliageBrushes.Length == 0) return;
+            if (config.foliageBrushes == null || config.foliageBrushes.Length == 0) return 0;
 
             int placedCount = 0;
             int maxAttempts = config.foliageClusterCount * 20;
@@ -231,23 +199,12 @@ namespace MechTS.EditorTools
                 if (data.GetSteepness(normX, normZ) > config.maxFoliageSlope) continue;
 
                 var candidate = new Vector3(terrainOrigin.x + normX * data.size.x, 0f, terrainOrigin.z + normZ * data.size.z);
-                if (IsTooClose(candidate, platformPositions, config.platformSpacing * 0.5f)) continue;
-
                 var brush = config.foliageBrushes[rng.Next(config.foliageBrushes.Length)];
                 painter.TryPaint(brush, candidate, 0f);
                 painter.EndDrag();
                 placedCount++;
             }
-        }
-
-        /// <summary>Whether <paramref name="candidate"/> is within <paramref name="minSpacing"/> (XZ only) of any position already in <paramref name="existing"/>.</summary>
-        private static bool IsTooClose(Vector3 candidate, List<Vector3> existing, float minSpacing)
-        {
-            foreach (var p in existing)
-            {
-                if (Vector2.Distance(new Vector2(candidate.x, candidate.z), new Vector2(p.x, p.z)) < minSpacing) return true;
-            }
-            return false;
+            return placedCount;
         }
 
         /// <summary>
