@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7279731439444999348}
   - component: {fileID: 6361942443846102512}
   - component: {fileID: 5030993213199024318}
+  - component: {fileID: 4526247070938204900}
   m_Layer: 9
   m_Name: EnemyDroneFactory
   m_TagString: Untagged
@@ -96,6 +97,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60f884370fb955f4cac4f089033089f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.ProductionQueue
+--- !u!114 &4526247070938204900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7984922478153507351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eedfb508f75e3f6498bbd9b384ba0659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MechTS.Economy.ProductionAnimator
+  _animator: {fileID: 6850030754359699029}
 --- !u!1001 &6850030754367050549
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -153,6 +167,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2bb29e11efa60f844ba3f0c47a6c0978, type: 3}
+--- !u!95 &6850030754359699029 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9500000, guid: 2bb29e11efa60f844ba3f0c47a6c0978, type: 3}
+  m_PrefabInstance: {fileID: 6850030754367050549}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6850030754366917043 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400006, guid: 2bb29e11efa60f844ba3f0c47a6c0978, type: 3}
