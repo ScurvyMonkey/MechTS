@@ -61,13 +61,22 @@ namespace MechTS.EditorTools
         /// every frame. Resolves the brush's own category-based Y-force and grid-snap before
         /// the spacing check (moved here from <see cref="MapEditorWindow.OnSceneGUI"/> as part
         /// of issue #87's extraction, same order/behavior as before): a "Terrain" category
-        /// brush (Platform_Tier1, Ramp) always starts flush on bare Ground (Y=0) — both prefabs
-        /// are built base-anchored specifically so their root sits at Y=0, and multi-tier
-        /// stacking is explicitly out of scope (issue #35) — without this override, painting a
-        /// new Terrain brush while hovering over already-placed elevated terrain would resolve
-        /// against that surface's height instead of the ground beneath it. Grid snapping
-        /// (issue #71) is independent of the Terrain Y-force — a Structures piece placed atop
-        /// an elevated surface still wants its X/Z snapped, just not its Y forced to 0.
+        /// brush (Platform_Tier1, Ramp) always starts flush on the real <c>OutdoorTerrain</c>
+        /// heightmap at that XZ (<see cref="Terrain.SampleHeight"/>) rather than whatever the
+        /// raw raycast happened to hit — both prefabs are built base-anchored specifically so
+        /// their root sits flush with bare ground, and multi-tier stacking is explicitly out of
+        /// scope (issue #35), so a Terrain brush painted while hovering over already-placed
+        /// elevated terrain still resolves against the ground beneath it, not that surface's
+        /// height. <b>Corrected in issue #94</b>: this used to hardcode <c>Y=0</c>, which was
+        /// correct back when <c>Ground</c> was a universally flat plane at Y=0, but became wrong
+        /// the moment issue #89 retired <c>Ground</c> and made <c>OutdoorTerrain</c>'s real,
+        /// non-flat elevation the actual surface — a Platform painted on a hillside would have
+        /// been buried or left floating. Sampling the real Terrain height preserves the
+        /// original no-stacking behavior (it still ignores whatever a Platform/Ramp underneath
+        /// the cursor raycasts to) while correctly following sculpted elevation instead of
+        /// assuming flat ground. Grid snapping (issue #71) is independent of the Terrain
+        /// Y-force — a Structures piece placed atop an elevated surface still wants its X/Z
+        /// snapped, just not its Y re-resolved this way.
         /// A splash brush's own <see cref="MapBrushDefinition.splashCount"/> instances all
         /// count as one paint tick for the spacing check, matching the origin click/drag point
         /// exactly like an ordinary brush does. For a splash brush specifically, the required
@@ -88,7 +97,10 @@ namespace MechTS.EditorTools
             if (!HasPaintablePrefab(brush)) return;
 
             Vector3 worldPoint = rawWorldPoint;
-            if (brush.category == TerrainCategory) worldPoint.y = 0f;
+            if (brush.category == TerrainCategory && Terrain.activeTerrain != null)
+            {
+                worldPoint.y = Terrain.activeTerrain.SampleHeight(worldPoint);
+            }
             if (brush.useGridSnap) worldPoint = SnapToGrid(worldPoint, gridSize);
 
             float requiredSpacing = brush.isSplashBrush
