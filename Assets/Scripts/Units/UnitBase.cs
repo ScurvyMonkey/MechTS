@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using MechTS.Core;
 using MechTS.Economy;
-using MechTS.Utilities;
 using MechTS.Vision;
 using UnityEngine;
 using UnityEngine.AI;
@@ -24,15 +22,6 @@ namespace MechTS.Units
     [RequireComponent(typeof(NavMeshAgent))]
     public class UnitBase : MonoBehaviour
     {
-        private const float RingSelectedScale = 1.15f;
-        private const float RingDimBrightness = 0.5f;
-
-        /// <summary>
-        /// How far above whatever surface this unit is standing on its art is nudged, so it
-        /// doesn't sit flush with that surface's own mesh. See <see cref="NudgeArtAboveSurface"/>.
-        /// </summary>
-        private const float ArtYOffset = 0.03f;
-
         /// <summary>
         /// The real visual altitude a flying unit (<see cref="IsFlying"/>) renders at, applied
         /// via <see cref="NavMeshAgent.baseOffset"/> in <see cref="Awake"/>. High enough to
@@ -48,14 +37,10 @@ namespace MechTS.Units
         [SerializeField] private bool _isFlying;
         [SerializeField] private float _visionRadius = 10f;
 
-        private static Material _sharedRingMaterial;
-
         private UnitManager _unitManager;
         private TechManager _techManager;
         private VisionManager _visionManager;
-        private MeshRenderer _ringRenderer;
-        private MaterialPropertyBlock _ringPropertyBlock;
-        private List<Renderer> _artRenderers;
+        private UnitVisuals _visuals;
         private float _baseMoveSpeed;
 
         /// <summary>This unit's ongoing Ore upkeep cost per minute (issue #48). See <see cref="SetUpkeepCost"/>.</summary>
@@ -83,7 +68,7 @@ namespace MechTS.Units
         public void SetFaction(Faction faction)
         {
             _faction = faction;
-            RefreshRingAppearance();
+            _visuals.RefreshRingAppearance(_faction, IsSelected);
         }
 
         /// <summary>
@@ -138,10 +123,9 @@ namespace MechTS.Units
         /// Caches the NavMeshAgent and Health references, disables agent-to-agent avoidance
         /// and sets a real hover altitude for a flying unit (see <see cref="IsFlying"/>,
         /// <see cref="FlightAltitude"/>), and builds this unit's merged faction/selection
-        /// ring — a hollow ring, sized from this unit's own <see cref="CapsuleCollider"/>
-        /// radius where present, dim in the unit's faction color at rest and brighter/larger
-        /// when selected (see <see cref="SetSelected"/>). Replaces the old separate
-        /// filled-disc faction ring (<c>FactionColor.CreateFactionRing</c>) and
+        /// ring plus art-visibility state via <see cref="UnitVisuals"/> (issue #96 — extracted
+        /// from this method; see that class for the ring/nudge details). Replaces the old
+        /// separate filled-disc faction ring (<c>FactionColor.CreateFactionRing</c>) and
         /// hidden-until-selected indicator — merging them avoids stacking two overlapping
         /// rings under real sprite art.
         /// </summary>
@@ -162,13 +146,9 @@ namespace MechTS.Units
                 Agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
             }
 
-            BuildRing();
-            RefreshRingAppearance();
+            _visuals = new UnitVisuals();
+            _visuals.Build(transform, _faction);
 
-            _artRenderers = new List<Renderer>(GetComponentsInChildren<Renderer>(true));
-            _artRenderers.Remove(_ringRenderer);
-
-            NudgeArtAboveSurface();
             ComputeCapabilities();
         }
 
@@ -208,98 +188,6 @@ namespace MechTS.Units
         }
 
         /// <summary>
-        /// Nudges each top-level art child (the direct children of this unit's own root that
-        /// carry a renderer — either a single "Art" wrapper or several matched-parts siblings
-        /// like Torso/Head/HandL/HandR, depending on the prefab's art convention) up by
-        /// <see cref="ArtYOffset"/>, so the art never sits flush with the surface the unit is
-        /// standing on. Every unit's art previously had zero offset from its own root, which
-        /// is also exactly where <see cref="NavMeshAgent"/> places the unit — on flat Ground
-        /// (world Y=0) this happened not to cause a visible problem, but standing on an
-        /// elevated <c>Platform_Tier1</c> (issue #35) put the art's sprite quads flush with
-        /// the platform's own solid mesh top, and the platform's opaque geometry consistently
-        /// won the depth test, hiding the unit's art entirely — found via direct pixel-level
-        /// verification, not a visual guess (a top-down render capture sampled at the unit's
-        /// exact screen position showed only the platform's own material color, no sprite
-        /// pixels at all). Walking each renderer up to its nearest ancestor that is a direct
-        /// child of this unit's own transform (rather than nudging every renderer
-        /// individually) avoids double-applying the offset to a nested child of an already-
-        /// nudged parent (e.g. a hand parented under a torso).
-        /// </summary>
-        private void NudgeArtAboveSurface()
-        {
-            var nudged = new HashSet<Transform>();
-            foreach (var renderer in _artRenderers)
-            {
-                if (renderer == null) continue;
-
-                Transform topLevel = renderer.transform;
-                while (topLevel.parent != null && topLevel.parent != transform)
-                {
-                    topLevel = topLevel.parent;
-                }
-
-                if (topLevel.parent == transform && nudged.Add(topLevel))
-                {
-                    topLevel.localPosition += Vector3.up * ArtYOffset;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Creates the ring GameObject (mesh + renderer), sized from this unit's collider footprint.
-        /// </summary>
-        private void BuildRing()
-        {
-            float radius = 0.5f;
-            var capsule = GetComponent<CapsuleCollider>();
-            if (capsule != null) radius = capsule.radius;
-
-            var ringGo = new GameObject("FactionRing");
-            ringGo.transform.SetParent(transform, false);
-            ringGo.transform.localPosition = new Vector3(0f, 0.02f, 0f);
-
-            var meshFilter = ringGo.AddComponent<MeshFilter>();
-            meshFilter.mesh = RingMesh.Create(radius * 1.4f, radius * 1.7f);
-
-            _ringRenderer = ringGo.AddComponent<MeshRenderer>();
-            _ringRenderer.material = GetRingMaterial();
-            _ringRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            _ringPropertyBlock = new MaterialPropertyBlock();
-        }
-
-        /// <summary>
-        /// Returns the shared unlit material used by every unit's ring, creating it once.
-        /// </summary>
-        private static Material GetRingMaterial()
-        {
-            if (_sharedRingMaterial == null)
-            {
-                var shader = Shader.Find("Universal Render Pipeline/Unlit");
-                _sharedRingMaterial = new Material(shader) { name = "UnitRingMaterial" };
-                _sharedRingMaterial.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
-            }
-            return _sharedRingMaterial;
-        }
-
-        /// <summary>
-        /// Updates the ring's color (dim faction color at rest, full brightness when
-        /// selected) and scale (a slight pop when selected) to reflect current state.
-        /// </summary>
-        private void RefreshRingAppearance()
-        {
-            if (_ringRenderer == null) return;
-
-            Color baseColor = FactionColor.GetColor(_faction);
-            Color color = IsSelected ? baseColor : baseColor * RingDimBrightness;
-
-            _ringPropertyBlock.SetColor("_BaseColor", color);
-            _ringRenderer.SetPropertyBlock(_ringPropertyBlock);
-
-            float scale = IsSelected ? RingSelectedScale : 1f;
-            _ringRenderer.transform.localScale = new Vector3(scale, 1f, scale);
-        }
-
-        /// <summary>
         /// Finds the scene's <see cref="UnitManager"/> and registers this unit with it, and
         /// subscribes to <see cref="TechManager.OnUpgradeResearched"/> so a MoveSpeed
         /// upgrade researched mid-round applies immediately, not just to units spawned
@@ -328,21 +216,7 @@ namespace MechTS.Units
             if (_faction == Faction.Player || _visionManager == null) return;
 
             bool visible = _visionManager.IsVisible(Faction.Player, transform.position);
-            SetArtVisible(visible);
-        }
-
-        /// <summary>
-        /// Enables or disables every art renderer and the faction/selection ring.
-        /// </summary>
-        /// <param name="visible">True to show, false to hide.</param>
-        private void SetArtVisible(bool visible)
-        {
-            foreach (var renderer in _artRenderers)
-            {
-                if (renderer != null) renderer.enabled = visible;
-            }
-
-            if (_ringRenderer != null) _ringRenderer.enabled = visible;
+            _visuals.SetArtVisible(visible);
         }
 
         /// <summary>
@@ -413,7 +287,7 @@ namespace MechTS.Units
         public void SetSelected(bool selected)
         {
             IsSelected = selected;
-            RefreshRingAppearance();
+            _visuals.RefreshRingAppearance(_faction, IsSelected);
         }
 
         /// <summary>
