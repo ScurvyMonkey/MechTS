@@ -6,8 +6,8 @@ namespace MechTS.Vision
 {
     /// <summary>
     /// Renders the Player faction's current <see cref="FogState"/> as a soft-edged shroud: a
-    /// single flat quad (built the same way as <see cref="Utilities.RingMesh"/> — flat in the
-    /// local XZ plane, normal facing +Y, no rotation needed) sampling a small per-cell
+    /// terrain-conforming grid mesh (one vertex per <see cref="VisionManager"/> grid-cell
+    /// corner, each sampling real <c>OutdoorTerrain</c> height) sampling a small per-cell
     /// <see cref="Texture2D"/> built from <see cref="VisionManager"/>'s grid. Bilinear texture
     /// filtering blends between cells automatically, giving a soft "edge of vision" gradient
     /// instead of the grid's hard per-cell boundaries.
@@ -23,6 +23,21 @@ namespace MechTS.Vision
     /// Unlit + <c>Cull Off</c> material pattern already proven to work for every unit/selection
     /// ring in the project.
     /// </remarks>
+    /// <remarks>
+    /// **Terrain-conforming mesh (issue #97, shipped 2026-09-11):** the original implementation
+    /// built a single flat quad at a fixed world <see cref="YOffset"/> — correct back when the
+    /// level was a universally flat <c>Ground</c> plane at Y=0 (pre-issue #89), but wrong once
+    /// <c>OutdoorTerrain</c> gained real variable elevation (issues #84/#89/#94): wherever real
+    /// terrain height dropped at or below that fixed offset, the terrain no longer occluded the
+    /// shroud in the depth buffer, so it rendered as a visible black/dark slab floating above
+    /// low ground instead of being hidden beneath higher ground the way it correctly was
+    /// elsewhere. Root-caused directly via `unity-mcp` (terrain data itself confirmed clean —
+    /// 0% holes, 0 NaN heights, valid layers/alphamaps — ruling out a data-corruption bug
+    /// before looking at rendering). Fixed by sampling <see cref="Terrain.SampleHeight"/> per
+    /// grid-cell-corner vertex instead of using one constant Y for the whole mesh — every other
+    /// aspect (the per-cell texture, the "update only changed cells" diffing, the material)
+    /// is unchanged.
+    /// </remarks>
     public class FogOfWarRenderer : MonoBehaviour
     {
         private static readonly Color UnexploredColor = new Color(0f, 0f, 0f, 1f);
@@ -30,11 +45,13 @@ namespace MechTS.Vision
         private static readonly Color VisibleColor = new Color(0f, 0f, 0f, 0f);
 
         /// <summary>
-        /// World-space Y offset above everything else (Ground at 0, Terrain-layer content
-        /// around 0.01-0.02, unit/selection rings at 0.02) so the shroud unambiguously wins
-        /// the depth test instead of Z-fighting with content at the same height — confirmed
-        /// necessary directly: without this offset, the quad sat at Y=0 (same as Ground) and
-        /// produced visible interleaved banding artifacts at fog-state boundaries.
+        /// World-space Y offset above the real terrain surface (Ground at 0, Terrain-layer
+        /// content around 0.01-0.02, unit/selection rings at 0.02) so the shroud unambiguously
+        /// wins the depth test instead of Z-fighting with content at the same height —
+        /// confirmed necessary directly: without this offset, the quad sat flush with the
+        /// ground and produced visible interleaved banding artifacts at fog-state boundaries.
+        /// Added on top of each vertex's own sampled terrain height (see
+        /// <see cref="BuildTerrainConformingMesh"/>), not a single constant world Y anymore.
         /// </summary>
         private const float YOffset = 0.05f;
 
@@ -52,9 +69,9 @@ namespace MechTS.Vision
         }
 
         /// <summary>
-        /// Builds the quad mesh and fog texture the first time <see cref="VisionManager"/>'s
-        /// grid becomes available, then updates only the texture pixels whose
-        /// <see cref="FogState"/> actually changed since the last tick.
+        /// Builds the terrain-conforming mesh and fog texture the first time
+        /// <see cref="VisionManager"/>'s grid becomes available, then updates only the texture
+        /// pixels whose <see cref="FogState"/> actually changed since the last tick.
         /// </summary>
         private void Update()
         {
@@ -85,8 +102,8 @@ namespace MechTS.Vision
         }
 
         /// <summary>
-        /// Builds the fog texture (initialized fully Unexplored) and the flat quad mesh/material
-        /// covering <see cref="VisionManager"/>'s full grid extent.
+        /// Builds the fog texture (initialized fully Unexplored) and the terrain-conforming
+        /// mesh/material covering <see cref="VisionManager"/>'s full grid extent.
         /// </summary>
         private void BuildQuadAndTexture()
         {
@@ -105,13 +122,10 @@ namespace MechTS.Vision
 
             _lastRendered = new FogState[width, height];
 
-            transform.position = new Vector3(0f, YOffset, 0f);
+            transform.position = Vector3.zero;
+            transform.rotation = Quaternion.identity;
 
-            Vector3 halfCell = new Vector3(VisionManager.CellSize * 0.5f, 0f, VisionManager.CellSize * 0.5f);
-            Vector3 min = _visionManager.CellToWorld(0, 0) - halfCell;
-            Vector3 max = _visionManager.CellToWorld(width - 1, height - 1) + halfCell;
-
-            gameObject.AddComponent<MeshFilter>().mesh = BuildFlatQuadMesh(min, max);
+            gameObject.AddComponent<MeshFilter>().mesh = BuildTerrainConformingMesh(width, height);
 
             var renderer = gameObject.AddComponent<MeshRenderer>();
             renderer.shadowCastingMode = ShadowCastingMode.Off;
@@ -144,31 +158,70 @@ namespace MechTS.Vision
         }
 
         /// <summary>
-        /// Builds a flat rectangular mesh lying in the local XZ plane (normal +Y), spanning
-        /// the given world-space corners — already oriented for this project's top-down
-        /// camera, no rotation needed (same convention as <see cref="Utilities.RingMesh"/>).
+        /// Builds a mesh with one vertex per grid-cell corner ((<paramref name="width"/>+1) by
+        /// (<paramref name="height"/>+1) vertices, sharing vertices between adjacent cells so
+        /// there are no seams), each sampling real <see cref="Terrain.SampleHeight"/> at its
+        /// world XZ position plus <see cref="YOffset"/> — draping the shroud over the actual
+        /// ground instead of sitting at one constant world height (issue #97). Falls back to a
+        /// flat Y of just <see cref="YOffset"/> if no active <see cref="Terrain"/> exists,
+        /// rather than throwing — mirrors <c>MapShellGenerator</c>'s existing "missing terrain
+        /// is a handled case" precedent. UV coordinates map each vertex to its corresponding
+        /// texel in the per-cell fog texture, identical to the original flat quad's mapping —
+        /// only the mesh's vertex positions changed, not how it samples the texture.
         /// </summary>
-        /// <param name="min">The rectangle's minimum world-space corner.</param>
-        /// <param name="max">The rectangle's maximum world-space corner.</param>
-        private static Mesh BuildFlatQuadMesh(Vector3 min, Vector3 max)
+        /// <param name="width">The vision grid's cell width.</param>
+        /// <param name="height">The vision grid's cell height.</param>
+        private Mesh BuildTerrainConformingMesh(int width, int height)
         {
-            var vertices = new[]
+            var terrain = Terrain.activeTerrain;
+            if (terrain == null)
             {
-                new Vector3(min.x, 0f, min.z),
-                new Vector3(min.x, 0f, max.z),
-                new Vector3(max.x, 0f, max.z),
-                new Vector3(max.x, 0f, min.z),
-            };
-            var uv = new[]
-            {
-                new Vector2(0f, 0f),
-                new Vector2(0f, 1f),
-                new Vector2(1f, 1f),
-                new Vector2(1f, 0f),
-            };
-            var triangles = new[] { 0, 1, 2, 0, 2, 3 };
+                Debug.LogWarning("MechTS: FogOfWarRenderer found no active Terrain — the shroud will render flat.");
+            }
 
-            var mesh = new Mesh { name = "FogOfWarQuad" };
+            Vector3 halfCell = new Vector3(VisionManager.CellSize * 0.5f, 0f, VisionManager.CellSize * 0.5f);
+            Vector3 min = _visionManager.CellToWorld(0, 0) - halfCell;
+
+            int vertsX = width + 1;
+            int vertsZ = height + 1;
+            var vertices = new Vector3[vertsX * vertsZ];
+            var uv = new Vector2[vertsX * vertsZ];
+
+            for (int j = 0; j < vertsZ; j++)
+            {
+                float worldZ = min.z + j * VisionManager.CellSize;
+                for (int i = 0; i < vertsX; i++)
+                {
+                    float worldX = min.x + i * VisionManager.CellSize;
+                    float terrainHeight = terrain != null ? terrain.SampleHeight(new Vector3(worldX, 0f, worldZ)) : 0f;
+
+                    int index = j * vertsX + i;
+                    vertices[index] = new Vector3(worldX, terrainHeight + YOffset, worldZ);
+                    uv[index] = new Vector2(i / (float)width, j / (float)height);
+                }
+            }
+
+            var triangles = new int[width * height * 6];
+            int t = 0;
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    int a = j * vertsX + i;
+                    int b = (j + 1) * vertsX + i;
+                    int c = (j + 1) * vertsX + i + 1;
+                    int d = j * vertsX + i + 1;
+
+                    triangles[t++] = a;
+                    triangles[t++] = b;
+                    triangles[t++] = c;
+                    triangles[t++] = a;
+                    triangles[t++] = c;
+                    triangles[t++] = d;
+                }
+            }
+
+            var mesh = new Mesh { name = "FogOfWarTerrainMesh" };
             mesh.SetVertices(vertices);
             mesh.SetUVs(0, uv);
             mesh.SetTriangles(triangles, 0);

@@ -1110,10 +1110,48 @@ Bootstrapper
                      queries alone — those consistently reported correct values throughout even
                      while nothing was actually drawing on screen. **Known gap**: resource nodes
                      are visually dimmed by the fog shroud like everything else, even though the
-                     original spec says they should always be fully visible — the single-quad
-                     approach has no clean way to carve out an exception per-object; flagged,
-                     not fixed, pending a design decision on whether that's actually still
-                     desired. **Unit
+                     original spec says they should always be fully visible — flagged, not
+                     fixed, pending a design decision on whether that's actually still desired;
+                     unaffected by and orthogonal to the terrain-conforming fix below.
+                     **Terrain-conforming shroud mesh (issue #97, shipped 2026-09-11):** the
+                     shroud was a single flat quad at a fixed world `Y=0.05` — correct when the
+                     level was a universally flat `Ground` plane (pre-issue #89), wrong once
+                     `OutdoorTerrain` gained real variable elevation (issues #84/#89/#94):
+                     wherever real terrain height dropped at or below that fixed offset, the
+                     terrain no longer occluded the shroud in the depth buffer, so it rendered
+                     as a visible black/dark slab floating above low ground — a designer-
+                     reported "black rendering" bug, root-caused via direct `unity-mcp`
+                     investigation (terrain data itself confirmed clean — 0% holes, 0 NaN
+                     heights, valid layers/alphamaps — before looking at rendering at all).
+                     Fixed by replacing the single flat quad with a mesh sharing one vertex per
+                     `VisionManager` grid-cell corner (`(GridWidth+1) × (GridHeight+1)`
+                     vertices, avoiding seams between adjacent cells), each sampling real
+                     `Terrain.SampleHeight` at its world XZ position plus the same `+0.05`
+                     offset — the shroud now drapes over the actual ground at any elevation
+                     instead of assuming one constant height. Falls back to a flat `Y=YOffset`
+                     with a `Debug.LogWarning` if no active `Terrain` exists, mirroring
+                     `MapShellGenerator`'s own "missing terrain is a handled case" precedent.
+                     Everything else (the per-cell texture, the "update only changed cells"
+                     diffing, the material) is unchanged. **Verified end-to-end in Play Mode,
+                     including a real methodology correction mid-verification**: the first
+                     re-capture after the fix showed the shroud covering *more* of the screen
+                     than before, not less — alarming at first glance, but correctly diagnosed
+                     as revealing a true pre-existing fact rather than a new regression: this
+                     session's frozen player loop (`Time.frameCount` stuck at 1) meant
+                     `VisionManager` had never ticked even once, so its entire grid was still at
+                     its default `Unexplored` state everywhere — the *old* flat-quad bug had
+                     been coincidentally masking this by sitting below most of the (generally-
+                     elevated) terrain, creating a false impression that fog was "mostly
+                     working" when no cell had actually been computed as Visible/Explored at
+                     all. Forcing `VisionManager`/`FogOfWarRenderer` through `SendMessage`d
+                     `Update()` ticks (this project's established frozen-loop workaround) let
+                     real per-cell vision compute for the first time, and the corrected capture
+                     showed exactly the intended result: fully transparent, artifact-free
+                     ground within a unit's live vision, and a shroud boundary that visibly
+                     curves along the terrain's actual mound contour outside it — confirming
+                     both the terrain-conforming fix and (incidentally) that `VisionManager`'s
+                     own tick logic was never actually broken, just never exercised in this
+                     particular frozen session. **Unit
                      visibility**: `UnitBase` gained an `Update()` (previously had none) that
                      hides an Enemy-owned unit's art + faction ring entirely outside the Player's
                      current vision — 2-state only, never remembered once out of sight, since a
