@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MechTS.Economy;
 using UnityEditor;
 using UnityEngine;
@@ -19,6 +20,13 @@ namespace MechTS.EditorTools
     /// result — those pieces are modular content meant for precise hand-placement (issue #35),
     /// and this tool doesn't attempt automatic geometry-aware alignment for them. Scope narrowed
     /// to environment/terrain only, per direct designer feedback the same day.
+    /// <para>
+    /// **Flat Zones (issue #98):** the generator now *reads* (never creates/moves/writes) each
+    /// faction's <c>PlayerStartPoint</c> position to flatten a guaranteed buildable pad around
+    /// it as part of the heightmap step (see <see cref="ApplyFlatZones"/>) — resource nodes,
+    /// buildings, and <c>PlayerStartPoint</c>s themselves are still never touched, only their
+    /// existing positions are consulted to shape the terrain around them.
+    /// </para>
     /// </summary>
     public class MapShellGenerator : EditorWindow
     {
@@ -81,7 +89,7 @@ namespace MechTS.EditorTools
             var rng = new System.Random(config.seed);
             var painter = new MapEditorPainter();
 
-            GenerateHeights(data, config, rng);
+            GenerateHeights(data, config, rng, terrain.transform.position);
             BlendLayers(data);
 
             int foliageCount = PlaceFoliage(config, rng, terrain.transform.position, data, painter);
@@ -94,11 +102,13 @@ namespace MechTS.EditorTools
 
         /// <summary>
         /// Writes a layered (3-octave) Perlin-noise heightmap, remapped into
-        /// <see cref="MapShellGenerationConfig.minHeight"/>/<see cref="MapShellGenerationConfig.maxHeight"/>.
-        /// Perlin noise itself has no seed parameter, so the seed instead offsets where in noise-space
-        /// each octave samples from.
+        /// <see cref="MapShellGenerationConfig.minHeight"/>/<see cref="MapShellGenerationConfig.maxHeight"/>,
+        /// then carves the configured flat zones (see <see cref="ApplyFlatZones"/>) into the
+        /// same array before writing it back — flat zones are part of this one heightmap step,
+        /// not a separate pass. Perlin noise itself has no seed parameter, so the seed instead
+        /// offsets where in noise-space each octave samples from.
         /// </summary>
-        private void GenerateHeights(TerrainData data, MapShellGenerationConfig config, System.Random rng)
+        private void GenerateHeights(TerrainData data, MapShellGenerationConfig config, System.Random rng, Vector3 terrainOrigin)
         {
             int res = data.heightmapResolution;
             float offsetX = (float)rng.NextDouble() * 10000f;
@@ -128,7 +138,131 @@ namespace MechTS.EditorTools
                     heights[z, x] = worldHeight / data.size.y;
                 }
             }
+
+            ApplyFlatZones(heights, data, config, rng, terrainOrigin, res);
+
             data.SetHeights(0, 0, heights);
+        }
+
+        /// <summary>
+        /// Flattens a set of designer-configured zones into the already-generated noise
+        /// heightmap (issue #98) — one anchored at each faction's <see cref="PlayerStartPoint"/>
+        /// (guaranteeing a flat buildable pad), plus <see cref="MapShellGenerationConfig.resourceZoneCount"/>
+        /// additional smaller zones scattered via the same rejection-sampling minimum-spacing
+        /// approach <see cref="PlaceFoliage"/> already uses. Logs (and skips, rather than
+        /// failing generation) if no <see cref="PlayerStartPoint"/>s exist yet for a faction —
+        /// generation should still succeed on a map that hasn't had start points painted.
+        /// </summary>
+        private void ApplyFlatZones(float[,] heights, TerrainData data, MapShellGenerationConfig config, System.Random rng, Vector3 terrainOrigin, int res)
+        {
+            var zoneCenters = new List<Vector3>();
+
+            var startPoints = Object.FindObjectsByType<PlayerStartPoint>(FindObjectsSortMode.None);
+            if (startPoints.Length == 0)
+            {
+                Debug.LogWarning("MechTS: MapShellGenerator found no PlayerStartPoints — skipping start-zone flattening. Paint start points before generating if you want guaranteed flat build pads.");
+            }
+
+            foreach (var start in startPoints)
+            {
+                FlattenZone(heights, data, terrainOrigin, res, start.transform.position, config.startZoneRadius, config.startZoneFalloff);
+                zoneCenters.Add(start.transform.position);
+            }
+
+            int maxAttempts = config.resourceZoneCount * 20;
+            int placed = 0;
+            for (int attempt = 0; attempt < maxAttempts && placed < config.resourceZoneCount; attempt++)
+            {
+                float normX = (float)rng.NextDouble();
+                float normZ = (float)rng.NextDouble();
+                var candidate = new Vector3(terrainOrigin.x + normX * data.size.x, 0f, terrainOrigin.z + normZ * data.size.z);
+
+                bool tooClose = false;
+                foreach (var existing in zoneCenters)
+                {
+                    if (Vector2.Distance(new Vector2(candidate.x, candidate.z), new Vector2(existing.x, existing.z)) < config.resourceZoneMinSpacing)
+                    {
+                        tooClose = true;
+                        break;
+                    }
+                }
+                if (tooClose) continue;
+
+                FlattenZone(heights, data, terrainOrigin, res, candidate, config.resourceZoneRadius, config.resourceZoneFalloff);
+                zoneCenters.Add(candidate);
+                placed++;
+            }
+
+            Debug.Log($"MechTS: Flattened {startPoints.Length} start zone(s) and {placed} resource zone(s).");
+        }
+
+        /// <summary>
+        /// Flattens a circular zone centered at <paramref name="worldCenter"/> into
+        /// <paramref name="heights"/> (still in Unity's normalized [0,1] heightmap units). The
+        /// flattened value is the average of the zone's own already-generated heights, read in
+        /// a first pass before any cell in the zone is overwritten, so a zone settles near its
+        /// surrounding terrain's general elevation rather than a fixed global height. Cells
+        /// within <paramref name="radius"/> are fully flattened; cells between
+        /// <paramref name="radius"/> and <paramref name="radius"/>+<paramref name="falloff"/>
+        /// blend linearly back to their original noise value, avoiding a hard cliff edge.
+        /// </summary>
+        private void FlattenZone(float[,] heights, TerrainData data, Vector3 terrainOrigin, int res, Vector3 worldCenter, float radius, float falloff)
+        {
+            float outerRadius = radius + falloff;
+            int minX = Mathf.Max(0, WorldToHeightmapIndex(worldCenter.x - outerRadius, terrainOrigin.x, data.size.x, res));
+            int maxX = Mathf.Min(res - 1, WorldToHeightmapIndex(worldCenter.x + outerRadius, terrainOrigin.x, data.size.x, res));
+            int minZ = Mathf.Max(0, WorldToHeightmapIndex(worldCenter.z - outerRadius, terrainOrigin.z, data.size.z, res));
+            int maxZ = Mathf.Min(res - 1, WorldToHeightmapIndex(worldCenter.z + outerRadius, terrainOrigin.z, data.size.z, res));
+
+            float sum = 0f;
+            int count = 0;
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Vector2 worldXz = HeightmapIndexToWorldXz(x, z, terrainOrigin, data, res);
+                    if (Vector2.Distance(worldXz, new Vector2(worldCenter.x, worldCenter.z)) <= radius)
+                    {
+                        sum += heights[z, x];
+                        count++;
+                    }
+                }
+            }
+            if (count == 0) return;
+            float flatValue = sum / count;
+
+            for (int z = minZ; z <= maxZ; z++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Vector2 worldXz = HeightmapIndexToWorldXz(x, z, terrainOrigin, data, res);
+                    float dist = Vector2.Distance(worldXz, new Vector2(worldCenter.x, worldCenter.z));
+                    if (dist <= radius)
+                    {
+                        heights[z, x] = flatValue;
+                    }
+                    else if (dist <= outerRadius)
+                    {
+                        float t = (dist - radius) / falloff;
+                        heights[z, x] = Mathf.Lerp(flatValue, heights[z, x], t);
+                    }
+                }
+            }
+        }
+
+        /// <summary>Converts a single world-space axis coordinate into a heightmap array index along that axis.</summary>
+        private static int WorldToHeightmapIndex(float worldCoord, float terrainOriginCoord, float terrainSize, int res)
+        {
+            float norm = Mathf.Clamp01((worldCoord - terrainOriginCoord) / terrainSize);
+            return Mathf.RoundToInt(norm * (res - 1));
+        }
+
+        /// <summary>Converts a heightmap array (x, z) index into its world-space XZ position.</summary>
+        private static Vector2 HeightmapIndexToWorldXz(int x, int z, Vector3 terrainOrigin, TerrainData data, int res)
+        {
+            float worldX = terrainOrigin.x + (x / (float)(res - 1)) * data.size.x;
+            float worldZ = terrainOrigin.z + (z / (float)(res - 1)) * data.size.z;
+            return new Vector2(worldX, worldZ);
         }
 
         /// <summary>

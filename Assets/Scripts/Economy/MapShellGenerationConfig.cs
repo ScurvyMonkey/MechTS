@@ -12,6 +12,13 @@ namespace MechTS.Economy
     /// than half-solved. ScriptableObject-first per convention so a future named preset (e.g.
     /// a "Canyon" vs. "Plains" style) is authoring a second asset, not a code change — v1 ships
     /// with one default config, presets are out of scope for now.
+    /// <para>
+    /// Flat Zones (issue #98): the generator also carves a small number of genuinely flat
+    /// regions into the same heightmap — one anchored at each faction's <c>PlayerStartPoint</c>
+    /// (a guaranteed buildable pad) plus a few smaller scattered ones for resource placement —
+    /// so a designer doesn't need a manual post-generation flatten pass (which risked the
+    /// terrain-elevation-vs-Fog-of-War rendering bug fixed in issue #97).
+    /// </para>
     /// </summary>
     [CreateAssetMenu(menuName = "MechTS/Map Editor/Map Shell Generation Config")]
     public class MapShellGenerationConfig : ScriptableObject
@@ -32,5 +39,24 @@ namespace MechTS.Economy
 
         /// <summary>Foliage is never placed where the terrain slope exceeds this angle, in degrees.</summary>
         [Range(0f, 90f)] public float maxFoliageSlope = 25f;
+
+        [Header("Flat Zones (issue #98)")]
+        /// <summary>Radius, in world units, of the guaranteed-flat zone reserved around each faction's <c>PlayerStartPoint</c>.</summary>
+        public float startZoneRadius = 15f;
+
+        /// <summary>Distance, in world units, over which a start zone blends back into the surrounding noise — avoids a hard cliff edge.</summary>
+        public float startZoneFalloff = 10f;
+
+        /// <summary>How many additional smaller flat zones (for resource-node placement) to scatter across the map.</summary>
+        public int resourceZoneCount = 4;
+
+        /// <summary>Radius, in world units, of each scattered resource flat zone.</summary>
+        public float resourceZoneRadius = 6f;
+
+        /// <summary>Distance, in world units, over which a resource zone blends back into the surrounding noise.</summary>
+        public float resourceZoneFalloff = 5f;
+
+        /// <summary>Minimum distance, in world units, enforced between resource flat zones (and from start zones) via rejection sampling.</summary>
+        public float resourceZoneMinSpacing = 15f;
     }
 }
